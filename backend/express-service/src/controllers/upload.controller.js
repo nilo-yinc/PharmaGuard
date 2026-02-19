@@ -1,4 +1,5 @@
 const { PharmaGuardRecord } = require('../models');
+const { analyzeVCF, transformFastAPIResults } = require('../services/fastapiService');
 
 /**
  * Upload VCF file and create a new PharmaGuardRecord
@@ -53,10 +54,6 @@ const uploadVCF = async (req, res) => {
 
     await record.save();
 
-    // TODO: Trigger FastAPI processing here
-    // Send VCF to FastAPI for analysis
-    // await sendToFastAPI(record._id, req.file.buffer);
-
     res.status(201).json({
       success: true,
       message: 'VCF file uploaded successfully',
@@ -76,6 +73,215 @@ const uploadVCF = async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to upload VCF file',
+      message: error.message
+    });
+  }
+};
+
+/**
+ * Upload VCF file and trigger immediate analysis with FastAPI
+ * @route POST /api/v1/upload-and-analyze
+ */
+const uploadAndAnalyze = async (req, res) => {
+  try {
+    const { patientId, drugs } = req.body;
+    
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'No VCF file uploaded'
+      });
+    }
+
+    // Validate patient ID
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Patient ID is required'
+      });
+    }
+
+    // Validate drugs array
+    if (!drugs || !Array.isArray(drugs) || drugs.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'At least one drug must be specified for analysis'
+      });
+    }
+
+    // Parse drugs if sent as string
+    const drugList = typeof drugs === 'string' ? JSON.parse(drugs) : drugs;
+
+    // Check if record already exists for this patient
+    const existingRecord = await PharmaGuardRecord.findByPatientId(patientId);
+    if (existingRecord) {
+      return res.status(409).json({
+        success: false,
+        error: 'Record already exists for this patient ID'
+      });
+    }
+
+    // Validate file size (max 5MB)
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    if (req.file.size > MAX_SIZE) {
+      return res.status(400).json({
+        success: false,
+        error: 'File size exceeds 5MB limit'
+      });
+    }
+
+    // Create new record with VCF file (status: processing)
+    const record = new PharmaGuardRecord({
+      patientId,
+      vcfBuffer: req.file.buffer,
+      fileName: req.file.originalname,
+      fileSize: req.file.size,
+      processingStatus: 'processing'
+    });
+
+    await record.save();
+
+    // Trigger FastAPI analysis in background
+    // Don't wait for response to avoid timeout
+    analyzeVCFInBackground(record._id, patientId, drugList, req.file.buffer);
+
+    res.status(202).json({
+      success: true,
+      message: 'VCF file uploaded successfully. Analysis started.',
+      data: {
+        recordId: record._id,
+        patientId: record.patientId,
+        fileName: record.fileName,
+        fileSize: record.fileSize,
+        fileSizeMB: record.fileSizeMB,
+        uploadTimestamp: record.uploadTimestamp,
+        processingStatus: record.processingStatus,
+        drugs: drugList
+      }
+    });
+
+  } catch (error) {
+    console.error('Upload and analyze error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to upload and analyze VCF file',
+      message: error.message
+    });
+  }
+};
+
+/**
+ * Background task to analyze VCF with FastAPI
+ * @param {string} recordId - MongoDB record ID
+ * @param {string} patientId - Patient ID
+ * @param {string[]} drugs - Array of drugs to analyze
+ * @param {Buffer} vcfBuffer - VCF file buffer
+ */
+const analyzeVCFInBackground = async (recordId, patientId, drugs, vcfBuffer) => {
+  try {
+    console.log(`🚀 Starting background analysis for record: ${recordId}`);
+
+    // Call FastAPI service
+    const analysisResult = await analyzeVCF({
+      patientId,
+      drugs,
+      vcfBuffer,
+      recordId
+    });
+
+    if (analysisResult.success) {
+      // Transform and update record with results
+      const formattedResults = transformFastAPIResults(analysisResult.data);
+
+      const record = await PharmaGuardRecord.findById(recordId);
+      if (record) {
+        await record.addResults(formattedResults);
+        console.log(`✅ Analysis completed and saved for record: ${recordId}`);
+      }
+    } else {
+      // Mark as failed
+      await PharmaGuardRecord.findByIdAndUpdate(
+        recordId,
+        {
+          processingStatus: 'failed',
+          errorMessage: analysisResult.message || 'Analysis failed'
+        }
+      );
+      console.error(`❌ Analysis failed for record: ${recordId}`);
+    }
+
+  } catch (error) {
+    console.error(`❌ Background analysis error for record ${recordId}:`, error);
+    
+    // Update record status to failed
+    await PharmaGuardRecord.findByIdAndUpdate(
+      recordId,
+      {
+        processingStatus: 'failed',
+        errorMessage: error.message
+      }
+    );
+  }
+};
+
+/**
+ * Trigger analysis for existing record
+ * @route POST /api/v1/records/:recordId/analyze
+ */
+const triggerAnalysis = async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    const { drugs } = req.body;
+
+    // Validate drugs array
+    if (!drugs || !Array.isArray(drugs) || drugs.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'At least one drug must be specified for analysis'
+      });
+    }
+
+    // Find record
+    const record = await PharmaGuardRecord.findById(recordId);
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        error: 'Record not found'
+      });
+    }
+
+    // Check if already processing
+    if (record.processingStatus === 'processing') {
+      return res.status(409).json({
+        success: false,
+        error: 'Analysis already in progress'
+      });
+    }
+
+    // Update status to processing
+    record.processingStatus = 'processing';
+    await record.save();
+
+    // Trigger analysis in background
+    analyzeVCFInBackground(recordId, record.patientId, drugs, record.vcfBuffer);
+
+    res.status(202).json({
+      success: true,
+      message: 'Analysis started',
+      data: {
+        recordId: record._id,
+        patientId: record.patientId,
+        processingStatus: 'processing',
+        drugs: drugs
+      }
+    });
+
+  } catch (error) {
+    console.error('Trigger analysis error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to trigger analysis',
       message: error.message
     });
   }
@@ -227,6 +433,8 @@ const getProcessingStatus = async (req, res) => {
 
 module.exports = {
   uploadVCF,
+  uploadAndAnalyze,
+  triggerAnalysis,
   getRecordByPatientId,
   getAllRecords,
   updateResults,

@@ -46,11 +46,15 @@ app.get('/', (req, res) => {
     service: 'Express.js',
     version: '1.0.0',
     database: 'MongoDB',
+    fastapiIntegration: process.env.FASTAPI_URL || 'Not configured',
     endpoints: {
       upload: 'POST /api/v1/upload',
+      uploadAndAnalyze: 'POST /api/v1/upload-and-analyze',
+      triggerAnalysis: 'POST /api/v1/records/:recordId/analyze',
       records: 'GET /api/v1/records',
       patientRecord: 'GET /api/v1/records/:patientId',
-      status: 'GET /api/v1/records/:recordId/status'
+      status: 'GET /api/v1/records/:recordId/status',
+      updateResults: 'PUT /api/v1/records/:recordId/results'
     }
   });
 });

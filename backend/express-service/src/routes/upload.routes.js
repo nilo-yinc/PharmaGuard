@@ -20,8 +20,38 @@ const upload = multer({
   }
 });
 
-// Upload VCF file
-router.post('/upload', upload.single('vcfFile'), uploadController.uploadVCF);
+// Multer error handling middleware
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // Multer-specific errors
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        error: 'File size exceeds 5MB limit'
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      error: err.message
+    });
+  } else if (err) {
+    // Other errors (e.g., from fileFilter)
+    return res.status(400).json({
+      success: false,
+      error: err.message
+    });
+  }
+  next();
+};
+
+// Upload VCF file only (no analysis)
+router.post('/upload', upload.single('vcfFile'), handleMulterError, uploadController.uploadVCF);
+
+// Upload VCF file and trigger immediate analysis with FastAPI
+router.post('/upload-and-analyze', upload.single('vcfFile'), handleMulterError, uploadController.uploadAndAnalyze);
+
+// Trigger analysis for existing record
+router.post('/records/:recordId/analyze', uploadController.triggerAnalysis);
 
 // Get all records (with pagination)
 router.get('/records', uploadController.getAllRecords);

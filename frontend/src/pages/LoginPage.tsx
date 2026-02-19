@@ -62,7 +62,17 @@ const LoginPage: React.FC = () => {
         if (result.success) {
             navigate(from, { replace: true });
         } else {
-            setError(result.error || 'Login failed.');
+            const loginError = result.error || 'Login failed.';
+            const accountNotFound = loginError.toLowerCase().includes('account not found');
+            if (accountNotFound) {
+                setError('No account found with this email. Redirecting to sign up...');
+                const targetEmail = encodeURIComponent(email.trim());
+                setTimeout(() => {
+                    navigate(`/register?email=${targetEmail}&from=login`, { replace: true });
+                }, 1200);
+                return;
+            }
+            setError(loginError);
         }
     };
 

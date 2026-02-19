@@ -87,7 +87,7 @@ const login = async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
     const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
-      return res.status(400).json({ status: false, message: 'Invalid email or password' });
+      return res.status(404).json({ status: false, message: 'Account not found. Please sign up first.' });
     }
 
     const isPasswordMatch = await user.comparePassword(password);

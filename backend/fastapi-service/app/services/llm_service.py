@@ -4,8 +4,6 @@ from groq import Groq
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
 def generate_explanation(gene: str, phenotype: str, drug: str, risk: str) -> dict:
     prompt = f"""
     Explain in simple medical language:
@@ -19,6 +17,11 @@ def generate_explanation(gene: str, phenotype: str, drug: str, risk: str) -> dic
     """
 
     try:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY is not set")
+
+        client = Groq(api_key=api_key)
         response = client.chat.completions.create(
             model="llama3-8b-8192",
             messages=[{"role": "user", "content": prompt}],

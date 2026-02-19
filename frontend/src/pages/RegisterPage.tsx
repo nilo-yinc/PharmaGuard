@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Dna } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const RegisterPage: React.FC = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const prefilledEmail = (params.get('email') || '').trim();
+    const fromLogin = params.get('from') === 'login';
 
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(prefilledEmail);
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [infoMessage] = useState(
+        fromLogin && prefilledEmail ? 'No account found. Create your account to continue.' : ''
+    );
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -85,6 +92,16 @@ const RegisterPage: React.FC = () => {
                                 style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', color: 'var(--danger)' }}
                             >
                                 {error}
+                            </motion.div>
+                        )}
+                        {infoMessage && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="px-4 py-3 rounded-xl text-sm"
+                                style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                            >
+                                {infoMessage}
                             </motion.div>
                         )}
 

@@ -50,7 +50,11 @@ app.get('/', (req, res) => {
       upload: 'POST /api/v1/upload',
       records: 'GET /api/v1/records',
       patientRecord: 'GET /api/v1/records/:patientId',
-      status: 'GET /api/v1/records/:recordId/status'
+      status: 'GET /api/v1/records/:recordId/status',
+      downloadVCF: 'GET /api/v1/records/:patientId/download',
+      vcfContent: 'GET /api/v1/records/:patientId/vcf-content',
+      vcfStats: 'GET /api/v1/records/:patientId/vcf-stats',
+      updateResults: 'PUT /api/v1/records/:recordId/results'
     }
   });
 });

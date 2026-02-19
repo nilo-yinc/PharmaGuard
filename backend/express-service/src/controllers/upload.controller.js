@@ -1,4 +1,5 @@
 const { PharmaGuardRecord } = require('../models');
+const { decodeVCFBuffer, isValidVCF, getVCFStats } = require('../utils/vcfDecoder');
 
 /**
  * Upload VCF file and create a new PharmaGuardRecord
@@ -225,10 +226,173 @@ const getProcessingStatus = async (req, res) => {
   }
 };
 
+/**
+ * Download original VCF file
+ * @route GET /api/v1/records/:patientId/download
+ */
+const downloadVCFFile = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const record = await PharmaGuardRecord.findByPatientId(patientId);
+    
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        error: 'Record not found for this patient ID'
+      });
+    }
+
+    if (!record.vcfBuffer) {
+      return res.status(404).json({
+        success: false,
+        error: 'VCF file not found for this record'
+      });
+    }
+
+    // Decode buffer to original content
+    const vcfContent = decodeVCFBuffer(record.vcfBuffer);
+
+    // Validate it's a proper VCF
+    if (!isValidVCF(vcfContent)) {
+      return res.status(500).json({
+        success: false,
+        error: 'Invalid VCF file format'
+      });
+    }
+
+    // Set headers for file download
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Disposition', `attachment; filename="${record.fileName}"`);
+    res.setHeader('Content-Length', record.vcfBuffer.length);
+    
+    // Send the decoded content
+    res.send(vcfContent);
+
+  } catch (error) {
+    console.error('Error downloading VCF:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to download VCF file',
+      message: error.message
+    });
+  }
+};
+
+/**
+ * Get VCF content as text (for preview)
+ * @route GET /api/v1/records/:patientId/vcf-content
+ */
+const getVCFContent = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const { preview } = req.query; // ?preview=true to get first 50 lines only
+
+    const record = await PharmaGuardRecord.findByPatientId(patientId);
+    
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        error: 'Record not found for this patient ID'
+      });
+    }
+
+    if (!record.vcfBuffer) {
+      return res.status(404).json({
+        success: false,
+        error: 'VCF file not found for this record'
+      });
+    }
+
+    // Decode buffer to original content
+    const vcfContent = decodeVCFBuffer(record.vcfBuffer);
+    const stats = getVCFStats(vcfContent);
+
+    // If preview mode, only return first 50 lines
+    let content = vcfContent;
+    if (preview === 'true') {
+      const lines = vcfContent.split('\n').slice(0, 50);
+      content = lines.join('\n');
+    }
+
+    res.json({
+      success: true,
+      data: {
+        patientId: record.patientId,
+        fileName: record.fileName,
+        content: content,
+        isPreview: preview === 'true',
+        stats: stats
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching VCF content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch VCF content',
+      message: error.message
+    });
+  }
+};
+
+/**
+ * Get VCF file statistics
+ * @route GET /api/v1/records/:patientId/vcf-stats
+ */
+const getVCFFileStats = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const record = await PharmaGuardRecord.findByPatientId(patientId)
+      .select('patientId fileName fileSize vcfBuffer uploadTimestamp');
+    
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        error: 'Record not found for this patient ID'
+      });
+    }
+
+    if (!record.vcfBuffer) {
+      return res.status(404).json({
+        success: false,
+        error: 'VCF file not found for this record'
+      });
+    }
+
+    // Decode and get stats
+    const vcfContent = decodeVCFBuffer(record.vcfBuffer);
+    const stats = getVCFStats(vcfContent);
+
+    res.json({
+      success: true,
+      data: {
+        patientId: record.patientId,
+        fileName: record.fileName,
+        uploadTimestamp: record.uploadTimestamp,
+        fileSize: record.fileSize,
+        vcfStats: stats
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching VCF stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch VCF statistics',
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   uploadVCF,
   getRecordByPatientId,
   getAllRecords,
   updateResults,
-  getProcessingStatus
+  getProcessingStatus,
+  downloadVCFFile,
+  getVCFContent,
+  getVCFFileStats
 };

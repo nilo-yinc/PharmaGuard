@@ -32,6 +32,15 @@ router.get('/records/:patientId', uploadController.getRecordByPatientId);
 // Get processing status
 router.get('/records/:recordId/status', uploadController.getProcessingStatus);
 
+// Download original VCF file
+router.get('/records/:patientId/download', uploadController.downloadVCFFile);
+
+// Get VCF content as text (with optional preview)
+router.get('/records/:patientId/vcf-content', uploadController.getVCFContent);
+
+// Get VCF file statistics
+router.get('/records/:patientId/vcf-stats', uploadController.getVCFFileStats);
+
 // Update record with analysis results (called by FastAPI or internally)
 router.put('/records/:recordId/results', uploadController.updateResults);
 

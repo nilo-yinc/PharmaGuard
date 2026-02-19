@@ -3,10 +3,10 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-const connectDB = require('./config/database');
+const connectDB = require('./src/config/database');
 
 // Import routes
-const uploadRoutes = require('./routes/upload.routes');
+const uploadRoutes = require('./src/routes/upload.routes');
 
 // Load environment variables
 dotenv.config();

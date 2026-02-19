@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const router = express.Router();
 const uploadController = require('../controllers/upload.controller');
+const isLoggedIn = require('../../auth/middlewares/isLoggedIn.middleware');
 
 // Configure multer for file upload (store in memory)
 const storage = multer.memoryStorage();
@@ -21,18 +22,24 @@ const upload = multer({
 });
 
 // Upload VCF file
-router.post('/upload', upload.single('vcfFile'), uploadController.uploadVCF);
+router.post('/upload', isLoggedIn, upload.single('vcfFile'), uploadController.uploadVCF);
 
 // Get all records (with pagination)
-router.get('/records', uploadController.getAllRecords);
+router.get('/records', isLoggedIn, uploadController.getAllRecords);
 
 // Get record by patient ID
-router.get('/records/:patientId', uploadController.getRecordByPatientId);
+router.get('/records/:patientId', isLoggedIn, uploadController.getRecordByPatientId);
+
+// Get record by Record ID
+router.get('/records/id/:recordId', isLoggedIn, uploadController.getRecordById);
 
 // Get processing status
-router.get('/records/:recordId/status', uploadController.getProcessingStatus);
+router.get('/records/:recordId/status', isLoggedIn, uploadController.getProcessingStatus);
 
 // Update record with analysis results (called by FastAPI or internally)
-router.put('/records/:recordId/results', uploadController.updateResults);
+router.put('/records/:recordId/results', isLoggedIn, uploadController.updateResults);
+
+// Trigger analysis
+router.post('/analyze', isLoggedIn, uploadController.triggerAnalysis);
 
 module.exports = router;

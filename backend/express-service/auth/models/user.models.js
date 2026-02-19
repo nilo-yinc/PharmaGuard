@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("../../src/config/sharedMongoose");
 const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
@@ -38,8 +38,21 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     verificationTokenExpiry: Date,
+    verificationToken: {
+      type: String,
+      default: null,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     resetPasswordToken: String,
     resetPasswordTokenExpiry: Date,
+    resetPasswordVerifiedToken: {
+      type: String,
+      default: null,
+    },
+    resetPasswordVerifiedTokenExpiry: Date,
     refreshToken: {
       type: String,
       default: null,

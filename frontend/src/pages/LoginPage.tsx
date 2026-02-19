@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { apiForgotPassword, apiVerifyResetOtp, apiResetPassword } from '../services/authApi';
+
+type ForgotStep = 'email' | 'otp' | 'password';
 
 const LoginPage: React.FC = () => {
     const { login } = useAuth();
@@ -14,21 +17,38 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
-    const [error, setError] = useState(
-        new URLSearchParams(window.location.search).get('error') === 'google_auth_failed'
-            ? 'Google sign-in failed. Please try again.'
+    const params = new URLSearchParams(window.location.search);
+    const [error, setError] = useState(() => {
+        if (params.get('error') === 'google_auth_failed') return 'Google sign-in failed. Please try again.';
+        return '';
+    });
+    const [infoMessage, setInfoMessage] = useState(() => (
+        params.get('registered') === '1'
+            ? 'Registration successful. You can sign in now.'
             : ''
-    );
+    ));
     const [isLoading, setIsLoading] = useState(false);
+
     const [showForgot, setShowForgot] = useState(false);
+    const [forgotStep, setForgotStep] = useState<ForgotStep>('email');
+    const [forgotEmail, setForgotEmail] = useState('');
+    const [otp, setOtp] = useState('');
+    const [resetToken, setResetToken] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [forgotLoading, setForgotLoading] = useState(false);
 
     const handleGoogleLogin = () => {
-        window.location.href = '/api/v1/users/google/login';
+        const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+        window.location.href = apiBase
+            ? `${apiBase}/api/v1/users/google/login`
+            : '/api/v1/users/google/login';
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setInfoMessage('');
 
         if (!email || !password) {
             setError('Please fill in all fields.');
@@ -46,6 +66,86 @@ const LoginPage: React.FC = () => {
         }
     };
 
+    const handleSendOtp = async () => {
+        const targetEmail = (forgotEmail || email).trim();
+        if (!targetEmail) {
+            setError('Enter your email to receive OTP.');
+            return;
+        }
+
+        setForgotLoading(true);
+        setError('');
+        const result = await apiForgotPassword(targetEmail);
+        setForgotLoading(false);
+
+        if (result.ok) {
+            setForgotEmail(targetEmail);
+            setForgotStep('otp');
+            if (result.data?.devOtp) {
+                setInfoMessage(`OTP sent. Dev OTP: ${result.data.devOtp}`);
+            } else {
+                setInfoMessage('OTP sent to your email. Please verify OTP.');
+            }
+        } else {
+            setError(result.error || 'Failed to send OTP');
+        }
+    };
+
+    const handleVerifyOtp = async () => {
+        if (!forgotEmail || !otp) {
+            setError('Enter email and OTP.');
+            return;
+        }
+
+        setForgotLoading(true);
+        setError('');
+        const result = await apiVerifyResetOtp(forgotEmail.trim(), otp.trim());
+        setForgotLoading(false);
+
+        if (result.ok && result.data?.resetToken) {
+            setResetToken(result.data.resetToken);
+            setForgotStep('password');
+            setInfoMessage('OTP verified. Set your new password.');
+        } else {
+            setError(result.error || 'Invalid OTP');
+        }
+    };
+
+    const handleSetNewPassword = async () => {
+        if (!resetToken) {
+            setError('OTP verification is required first.');
+            return;
+        }
+        if (!newPassword || newPassword.length < 6) {
+            setError('Password must be at least 6 characters long.');
+            return;
+        }
+        if (newPassword !== confirmNewPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+
+        setForgotLoading(true);
+        setError('');
+        const resetResult = await apiResetPassword(resetToken, newPassword);
+        if (!resetResult.ok) {
+            setForgotLoading(false);
+            setError(resetResult.error || 'Failed to update password');
+            return;
+        }
+
+        const loginResult = await login(forgotEmail.trim(), newPassword);
+        setForgotLoading(false);
+        if (loginResult.success) {
+            navigate('/dashboard', { replace: true });
+            return;
+        }
+
+        setShowForgot(false);
+        setForgotStep('email');
+        setInfoMessage('Password updated successfully. Please login.');
+    };
+
     return (
         <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
             <motion.div
@@ -54,7 +154,6 @@ const LoginPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="w-full max-w-md"
             >
-                {/* Header */}
                 <div className="text-center mb-8">
                     <motion.div
                         initial={{ scale: 0.8 }}
@@ -68,10 +167,8 @@ const LoginPage: React.FC = () => {
                     <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>Sign in to your PharmaGuard account</p>
                 </div>
 
-                {/* Form Card */}
                 <div className="rounded-2xl p-8" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* Error message */}
                         {error && (
                             <motion.div
                                 initial={{ opacity: 0, y: -8 }}
@@ -83,19 +180,109 @@ const LoginPage: React.FC = () => {
                             </motion.div>
                         )}
 
-                        {/* Forgot password toast */}
-                        {showForgot && (
+                        {infoMessage && (
                             <motion.div
                                 initial={{ opacity: 0, y: -8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="px-4 py-3 rounded-xl text-sm"
-                                style={{ background: 'var(--warning-light)', border: '1px solid var(--warning)', color: 'var(--warning)' }}
+                                style={{ background: 'var(--success-light)', border: '1px solid var(--success)', color: 'var(--success)' }}
                             >
-                                Password reset is not available in demo mode. Please create a new account.
+                                {infoMessage}
                             </motion.div>
                         )}
 
-                        {/* Email */}
+                        {showForgot && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="px-4 py-3 rounded-xl text-sm space-y-2"
+                                style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                            >
+                                {forgotStep === 'email' && (
+                                    <>
+                                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                            Enter your email to receive OTP.
+                                        </p>
+                                        <input
+                                            type="email"
+                                            value={forgotEmail}
+                                            onChange={(e) => setForgotEmail(e.target.value)}
+                                            placeholder="you@example.com"
+                                            className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleSendOtp}
+                                            disabled={forgotLoading}
+                                            className="px-3 py-2 rounded-lg text-xs font-semibold text-white"
+                                            style={{ background: 'var(--primary)', opacity: forgotLoading ? 0.7 : 1 }}
+                                        >
+                                            {forgotLoading ? 'Sending...' : 'Send OTP'}
+                                        </button>
+                                    </>
+                                )}
+
+                                {forgotStep === 'otp' && (
+                                    <>
+                                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                            Enter OTP sent to {forgotEmail}
+                                        </p>
+                                        <input
+                                            type="text"
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value)}
+                                            placeholder="6-digit OTP"
+                                            className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleVerifyOtp}
+                                            disabled={forgotLoading}
+                                            className="px-3 py-2 rounded-lg text-xs font-semibold text-white"
+                                            style={{ background: 'var(--primary)', opacity: forgotLoading ? 0.7 : 1 }}
+                                        >
+                                            {forgotLoading ? 'Verifying...' : 'Verify OTP'}
+                                        </button>
+                                    </>
+                                )}
+
+                                {forgotStep === 'password' && (
+                                    <>
+                                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                            OTP verified. Set your new password.
+                                        </p>
+                                        <input
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            placeholder="New password"
+                                            className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                                        />
+                                        <input
+                                            type="password"
+                                            value={confirmNewPassword}
+                                            onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                            placeholder="Confirm new password"
+                                            className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleSetNewPassword}
+                                            disabled={forgotLoading}
+                                            className="px-3 py-2 rounded-lg text-xs font-semibold text-white"
+                                            style={{ background: 'var(--primary)', opacity: forgotLoading ? 0.7 : 1 }}
+                                        >
+                                            {forgotLoading ? 'Updating...' : 'Save Password & Login'}
+                                        </button>
+                                    </>
+                                )}
+                            </motion.div>
+                        )}
+
                         <div>
                             <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email Address</label>
                             <div className="relative">
@@ -113,7 +300,6 @@ const LoginPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Password */}
                         <div>
                             <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>Password</label>
                             <div className="relative">
@@ -139,7 +325,6 @@ const LoginPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Remember me + Forgot */}
                         <div className="flex items-center justify-between">
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -153,7 +338,11 @@ const LoginPage: React.FC = () => {
                             </label>
                             <button
                                 type="button"
-                                onClick={() => setShowForgot(true)}
+                                onClick={() => {
+                                    setShowForgot(true);
+                                    setForgotStep('email');
+                                    setForgotEmail(email);
+                                }}
                                 className="text-xs font-medium transition-colors"
                                 style={{ color: 'var(--primary)' }}
                             >
@@ -161,7 +350,6 @@ const LoginPage: React.FC = () => {
                             </button>
                         </div>
 
-                        {/* Submit */}
                         <motion.button
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
@@ -184,7 +372,6 @@ const LoginPage: React.FC = () => {
                         </motion.button>
                     </form>
 
-                    {/* Google OAuth — enable after production setup */}
                     {false && (
                         <div className="mt-4">
                             <div className="relative flex items-center my-4">
@@ -200,18 +387,11 @@ const LoginPage: React.FC = () => {
                                 className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-3 transition-all duration-200"
                                 style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                             >
-                                <svg width="18" height="18" viewBox="0 0 48 48">
-                                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-                                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-                                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-                                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-                                </svg>
                                 Continue with Google
                             </motion.button>
                         </div>
                     )}
 
-                    {/* Register link */}
                     <div className="text-center mt-6 pt-6" style={{ borderTop: '1px solid var(--border)' }}>
                         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                             Don't have an account?{' '}

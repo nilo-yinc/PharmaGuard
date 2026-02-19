@@ -1,28 +1,60 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     ArrowLeft, Calendar, Pill, Download, Share2,
     Trash2, FileText, AlertTriangle, ShieldCheck,
-    BarChart3, Brain, Stethoscope, Code, Copy, Check
+    BarChart3, Brain, Stethoscope, Code, Copy, Check, MessageSquare
 } from 'lucide-react';
-import { getAnalysisById, deleteAnalysis, StoredAnalysis, StoredDrugRisk } from '../services/storageService';
+import { analysisApi, AnalysisResponse } from '../services/analysisApi';
+import { deleteAnalysis, StoredAnalysis } from '../services/storageService';
 import { RISK_COLORS } from '../utils/mockData';
 import Dashboard from './Dashboard';
+import ChatPanel from '../components/ai-chat/ChatPanel';
 
 type TabId = 'summary' | 'clinical' | 'variants' | 'heatmap' | 'json';
 
 const ReportPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [analysis, setAnalysis] = useState<StoredAnalysis | null>(() =>
-        id ? getAnalysisById(id) : null
-    );
+    const [analysis, setAnalysis] = useState<StoredAnalysis | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     const [activeTab, setActiveTab] = useState<TabId>('summary');
     const [copied, setCopied] = useState(false);
     const [showShareToast, setShowShareToast] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
-    if (!analysis) {
+    useEffect(() => {
+        const fetchAnalysis = async () => {
+            if (!id) return;
+            try {
+                const { success, data, error } = await analysisApi.getResults(id);
+                if (success && data) {
+                    setAnalysis(data);
+                } else {
+                    setError(error || 'Failed to load report');
+                }
+            } catch (err: any) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAnalysis();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 rounded-full animate-spin"
+                    style={{ borderColor: '#E5E7EB', borderTopColor: '#0D7377' }} />
+            </div>
+        );
+    }
+
+    if (error || !analysis) {
         return (
             <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">
                 <div className="text-center">
@@ -30,7 +62,7 @@ const ReportPage: React.FC = () => {
                         <AlertTriangle size={24} style={{ color: 'var(--danger)' }} />
                     </div>
                     <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Report Not Found</h2>
-                    <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>This analysis report doesn't exist or has been deleted.</p>
+                    <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{error || "This analysis report doesn't exist."}</p>
                     <Link to="/dashboard">
                         <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white" style={{ background: 'var(--primary)' }}>
                             Back to Dashboard
@@ -345,6 +377,30 @@ const ReportPage: React.FC = () => {
             <div className="mt-4" style={{ borderTop: '1px solid var(--border)' }}>
                 <Dashboard selectedDrugs={analysis.drugsAnalyzed} />
             </div>
+
+            {/* Floating Chat Button */}
+            <motion.button
+                onClick={() => setIsChatOpen(true)}
+                className="fixed bottom-6 right-6 z-30 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105"
+                style={{
+                    background: 'var(--primary)',
+                    boxShadow: '0 4px 20px rgba(13,115,119,0.35)',
+                }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+            >
+                <MessageSquare size={22} color="#fff" />
+            </motion.button>
+
+            {/* Chat Panel */}
+            <ChatPanel
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+                analysis={analysis}
+            />
         </div>
     );
 };

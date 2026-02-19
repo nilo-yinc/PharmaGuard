@@ -331,3 +331,220 @@ export const SEVERITY_COLORS: Record<string, string> = {
     high: '#f97316',
     critical: '#ef4444',
 };
+
+export interface ConfidenceDecomposition {
+    evidenceStrength: number;
+    variantCoverage: number;
+    dataQuality: number;
+    guidelineAlignment: number;
+    cpicLevel: string;
+}
+
+export interface PopulationStat {
+    phenotype: string;
+    prevalence: number;
+    ancestry: string;
+    rarity: 'common' | 'uncommon' | 'rare' | 'very rare';
+    percentile: number;
+}
+
+export interface FdaBiomarkerPair {
+    recognized: boolean;
+    label: string;
+    tooltip: string;
+}
+
+export interface AnalysisHistoryEntry {
+    id: string;
+    date: string;
+    engineVersion: string;
+    cpicVersion: string;
+    overallRisk: number;
+    topRiskDrug: string;
+    confidenceScore: number;
+    isCurrent: boolean;
+}
+
+export interface PolygenicWeight {
+    gene: string;
+    weight: number;
+    impact: string;
+}
+
+export type ActivityLevel = 'poor' | 'intermediate' | 'normal' | 'rapid' | 'ultrarapid';
+
+export interface EnzymeActivity {
+    level: ActivityLevel;
+    color: string;
+    explanation: string;
+}
+
+export const CONFIDENCE_DECOMPOSITION: Record<string, ConfidenceDecomposition> = {
+    CODEINE: { evidenceStrength: 96, variantCoverage: 92, dataQuality: 95, guidelineAlignment: 93, cpicLevel: 'A' },
+    WARFARIN: { evidenceStrength: 92, variantCoverage: 89, dataQuality: 90, guidelineAlignment: 91, cpicLevel: 'A' },
+    CLOPIDOGREL: { evidenceStrength: 94, variantCoverage: 88, dataQuality: 90, guidelineAlignment: 92, cpicLevel: 'A' },
+    SIMVASTATIN: { evidenceStrength: 82, variantCoverage: 77, dataQuality: 80, guidelineAlignment: 78, cpicLevel: 'A' },
+    AZATHIOPRINE: { evidenceStrength: 98, variantCoverage: 96, dataQuality: 97, guidelineAlignment: 95, cpicLevel: 'A' },
+    FLUOROURACIL: { evidenceStrength: 86, variantCoverage: 82, dataQuality: 84, guidelineAlignment: 81, cpicLevel: 'A' },
+};
+
+export const POPULATION_STATS: Record<string, PopulationStat> = {
+    CYP2D6: { phenotype: 'Ultra-rapid Metabolizer', prevalence: 2.1, ancestry: 'Global mixed', rarity: 'rare', percentile: 96 },
+    CYP2C9: { phenotype: 'Intermediate Metabolizer', prevalence: 11.8, ancestry: 'European enriched', rarity: 'uncommon', percentile: 78 },
+    VKORC1: { phenotype: 'Reduced Sensitivity', prevalence: 34.7, ancestry: 'Global', rarity: 'common', percentile: 61 },
+    CYP2C19: { phenotype: 'Intermediate Metabolizer', prevalence: 27.5, ancestry: 'Asian enriched', rarity: 'common', percentile: 73 },
+    TPMT: { phenotype: 'Intermediate Metabolizer', prevalence: 8.9, ancestry: 'Global mixed', rarity: 'uncommon', percentile: 91 },
+    DPYD: { phenotype: 'Normal Metabolizer', prevalence: 76.2, ancestry: 'Global', rarity: 'common', percentile: 24 },
+    SLCO1B1: { phenotype: 'Decreased Function', prevalence: 13.2, ancestry: 'Global mixed', rarity: 'uncommon', percentile: 84 },
+};
+
+export const FDA_BIOMARKER_PAIRS: Record<string, FdaBiomarkerPair> = {
+    'CYP2D6-CODEINE': {
+        recognized: true,
+        label: 'FDA Biomarker',
+        tooltip: 'CYP2D6 is an FDA-labeled pharmacogenomic biomarker for codeine safety and efficacy.',
+    },
+    'CYP2C9-WARFARIN': {
+        recognized: true,
+        label: 'FDA Biomarker',
+        tooltip: 'CYP2C9 genotype impacts warfarin exposure and dose recommendations in FDA labeling.',
+    },
+    'VKORC1-WARFARIN': {
+        recognized: true,
+        label: 'FDA Biomarker',
+        tooltip: 'VKORC1 variation affects warfarin sensitivity and initial dose strategy.',
+    },
+    'CYP2C19-CLOPIDOGREL': {
+        recognized: true,
+        label: 'FDA Biomarker',
+        tooltip: 'CYP2C19 poor/intermediate metabolism can reduce clopidogrel response.',
+    },
+    'SLCO1B1-SIMVASTATIN': {
+        recognized: true,
+        label: 'FDA Biomarker',
+        tooltip: 'SLCO1B1 decreased function is associated with increased simvastatin myopathy risk.',
+    },
+    'TPMT-AZATHIOPRINE': {
+        recognized: true,
+        label: 'FDA Biomarker',
+        tooltip: 'TPMT activity strongly influences thiopurine toxicity risk and initial dosing.',
+    },
+    'DPYD-FLUOROURACIL': {
+        recognized: true,
+        label: 'FDA Biomarker',
+        tooltip: 'DPYD deficiency increases fluoropyrimidine toxicity risk and supports dose reduction.',
+    },
+};
+
+export const ANALYSIS_HISTORY: AnalysisHistoryEntry[] = [
+    {
+        id: 'h1',
+        date: '2025-12-14T09:12:00.000Z',
+        engineVersion: 'v2.2.0',
+        cpicVersion: 'CPIC v23.4',
+        overallRisk: 74,
+        topRiskDrug: 'CODEINE',
+        confidenceScore: 86,
+        isCurrent: false,
+    },
+    {
+        id: 'h2',
+        date: '2026-01-08T11:45:00.000Z',
+        engineVersion: 'v2.3.1',
+        cpicVersion: 'CPIC v24.0',
+        overallRisk: 69,
+        topRiskDrug: 'AZATHIOPRINE',
+        confidenceScore: 89,
+        isCurrent: false,
+    },
+    {
+        id: 'h3',
+        date: '2026-02-19T15:10:00.000Z',
+        engineVersion: 'v2.4.0',
+        cpicVersion: 'CPIC v24.2',
+        overallRisk: 67,
+        topRiskDrug: 'CODEINE',
+        confidenceScore: 92,
+        isCurrent: true,
+    },
+];
+
+export const POLYGENIC_WEIGHTS: Record<string, PolygenicWeight[]> = {
+    CODEINE: [
+        { gene: 'CYP2D6', weight: 58, impact: 'Primary activation pathway; copy number increase drives toxicity' },
+        { gene: 'OPRM1', weight: 24, impact: 'Opioid receptor sensitivity modifier' },
+        { gene: 'ABCB1', weight: 18, impact: 'CNS transport and exposure modulation' },
+    ],
+    WARFARIN: [
+        { gene: 'CYP2C9', weight: 44, impact: 'Reduced metabolic clearance component' },
+        { gene: 'VKORC1', weight: 39, impact: 'Target sensitivity and dose requirement' },
+        { gene: 'CYP4F2', weight: 17, impact: 'Vitamin K cycling modifier' },
+    ],
+    CLOPIDOGREL: [
+        { gene: 'CYP2C19', weight: 61, impact: 'Major prodrug activation determinant' },
+        { gene: 'ABCB1', weight: 23, impact: 'Absorption and bioavailability influence' },
+        { gene: 'PON1', weight: 16, impact: 'Minor activation pathway contribution' },
+    ],
+    SIMVASTATIN: [
+        { gene: 'SLCO1B1', weight: 63, impact: 'Hepatic uptake and systemic exposure driver' },
+        { gene: 'ABCG2', weight: 21, impact: 'Efflux transporter effect' },
+        { gene: 'CYP3A4', weight: 16, impact: 'Metabolic contribution to clearance' },
+    ],
+    AZATHIOPRINE: [
+        { gene: 'TPMT', weight: 68, impact: 'Thiopurine inactivation capacity' },
+        { gene: 'NUDT15', weight: 22, impact: 'TGN handling and marrow toxicity risk' },
+        { gene: 'ITPA', weight: 10, impact: 'Secondary tolerance modifier' },
+    ],
+    FLUOROURACIL: [
+        { gene: 'DPYD', weight: 72, impact: 'Primary 5-FU catabolism determinant' },
+        { gene: 'TYMS', weight: 18, impact: 'Target pathway sensitivity' },
+        { gene: 'MTHFR', weight: 10, impact: 'Folate cycle modulation of toxicity' },
+    ],
+};
+
+export const CYP_DRUG_ENZYME: Record<string, string[]> = {
+    CODEINE: ['CYP2D6'],
+    WARFARIN: ['CYP2C9', 'CYP3A4'],
+    CLOPIDOGREL: ['CYP2C19', 'CYP3A4'],
+    SIMVASTATIN: ['CYP3A4', 'SLCO1B1'],
+    AZATHIOPRINE: ['TPMT'],
+    FLUOROURACIL: ['DPYD'],
+};
+
+export const ENZYME_ACTIVITY_MAP: Record<string, EnzymeActivity> = {
+    CYP2D6: {
+        level: 'ultrarapid',
+        color: '#ef4444',
+        explanation: 'Multiple functional copies increase conversion of prodrugs such as codeine.',
+    },
+    CYP2C9: {
+        level: 'intermediate',
+        color: '#f59e0b',
+        explanation: 'Reduced CYP2C9 activity can elevate exposure for CYP2C9 substrates.',
+    },
+    VKORC1: {
+        level: 'intermediate',
+        color: '#f59e0b',
+        explanation: 'VKORC1 variation modifies warfarin sensitivity and initial dosing needs.',
+    },
+    CYP2C19: {
+        level: 'intermediate',
+        color: '#f59e0b',
+        explanation: 'Lower activation efficiency can reduce clopidogrel antiplatelet response.',
+    },
+    TPMT: {
+        level: 'intermediate',
+        color: '#f97316',
+        explanation: 'Decreased TPMT activity raises active thiopurine metabolite exposure.',
+    },
+    DPYD: {
+        level: 'normal',
+        color: '#10b981',
+        explanation: 'Normal DPYD activity supports standard fluoropyrimidine dose initiation.',
+    },
+    SLCO1B1: {
+        level: 'intermediate',
+        color: '#f59e0b',
+        explanation: 'Decreased transporter function can increase systemic statin concentrations.',
+    },
+};

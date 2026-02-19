@@ -56,12 +56,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const register = useCallback(async (name: string, email: string, password: string) => {
         const result = await apiRegister(name, email, password);
         if (result.ok) {
-            // Auto-login after register
-            const loginResult = await apiLogin(email, password);
-            if (loginResult.ok && loginResult.data?.user) {
-                setUser(loginResult.data.user);
-                return { success: true };
-            }
+            return { success: true };
         }
         return { success: false, error: result.error || 'Registration failed.' };
     }, []);

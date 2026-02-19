@@ -8,17 +8,50 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserAnalyses, getUserStats, deleteAnalysis, StoredAnalysis } from '../services/storageService';
+import { analysisApi } from '../services/analysisApi';
+import { StoredAnalysis } from '../services/storageService';
 
 const UserDashboard: React.FC = () => {
     const { user } = useAuth();
-    const [analyses, setAnalyses] = useState<StoredAnalysis[]>(() =>
-        user ? getUserAnalyses(user.id) : []
-    );
-    const stats = useMemo(() => user ? getUserStats(user.id) : { totalAnalyses: 0, highRiskDrugs: 0, avgConfidence: 0 }, [user, analyses]);
+    const [analyses, setAnalyses] = useState<StoredAnalysis[]>([]);
+    const [loading, setLoading] = useState(true);
+    const stats = useMemo(() => {
+        const totalAnalyses = analyses.length;
+        let highRiskDrugs = 0;
+        let totalConfidence = 0;
+        let confidenceCount = 0;
+
+        analyses.forEach((a) => {
+            a.results.forEach((r) => {
+                if (r.riskLevel === 'toxic') highRiskDrugs++;
+                totalConfidence += r.confidence;
+                confidenceCount++;
+            });
+        });
+
+        return {
+            totalAnalyses,
+            highRiskDrugs,
+            avgConfidence: confidenceCount > 0 ? Math.round(totalConfidence / confidenceCount) : 0
+        };
+    }, [analyses]);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [riskFilter, setRiskFilter] = useState<string>('all');
+
+    React.useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            const { success, data } = await analysisApi.getRecentRecords(40);
+            if (success && Array.isArray(data)) {
+                setAnalyses(data);
+            } else {
+                setAnalyses([]);
+            }
+            setLoading(false);
+        };
+        load();
+    }, []);
 
     const filteredAnalyses = useMemo(() => {
         let result = analyses;
@@ -36,7 +69,6 @@ const UserDashboard: React.FC = () => {
     }, [analyses, searchQuery, riskFilter]);
 
     const handleDelete = (id: string) => {
-        deleteAnalysis(id);
         setAnalyses(prev => prev.filter(a => a.id !== id));
     };
 
@@ -209,7 +241,11 @@ const UserDashboard: React.FC = () => {
                     </div>
 
                     {/* Report Cards */}
-                    {filteredAnalyses.length === 0 ? (
+                    {loading ? (
+                        <div className="text-center py-12 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            Loading reports...
+                        </div>
+                    ) : filteredAnalyses.length === 0 ? (
                         <div className="text-center py-16">
                             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
                                 style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}>

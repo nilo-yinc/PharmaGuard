@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
     User, Mail, Lock, Eye, EyeOff, Shield,
-    Trash2, BarChart3, Clock, FileText, AlertTriangle,
+    Trash2, BarChart3, Clock, AlertTriangle,
     Save, Check
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserStats, getUserAnalyses } from '../services/storageService';
+import { analysisApi } from '../services/analysisApi';
 
 const ProfilePage: React.FC = () => {
     const { user, updateProfile, logout } = useAuth();
     const navigate = useNavigate();
-    const stats = user ? getUserStats(user.id) : { totalAnalyses: 0, highRiskDrugs: 0, avgConfidence: 0 };
-    const analyses = user ? getUserAnalyses(user.id) : [];
 
+    const [stats, setStats] = useState({ totalAnalyses: 0, highRiskDrugs: 0, avgConfidence: 0, vcfFiles: 0 });
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
     const [profileSaved, setProfileSaved] = useState(false);
@@ -29,6 +28,34 @@ const ProfilePage: React.FC = () => {
     const [privacyMode, setPrivacyMode] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+    useEffect(() => {
+        const loadStats = async () => {
+            const { success, data } = await analysisApi.getRecentRecords(500);
+            if (!success || !Array.isArray(data)) return;
+
+            const totalAnalyses = data.length;
+            let highRiskDrugs = 0;
+            let totalConfidence = 0;
+            let confidenceCount = 0;
+
+            data.forEach((analysis: any) => {
+                analysis.results.forEach((risk: any) => {
+                    if (risk.riskLevel === 'toxic') highRiskDrugs++;
+                    totalConfidence += risk.confidence;
+                    confidenceCount++;
+                });
+            });
+
+            setStats({
+                totalAnalyses,
+                highRiskDrugs,
+                avgConfidence: confidenceCount > 0 ? Math.round(totalConfidence / confidenceCount) : 0,
+                vcfFiles: totalAnalyses,
+            });
+        };
+        loadStats();
+    }, []);
+
     const handleSaveProfile = async () => {
         const result = await updateProfile({ name });
         if (result.success) {
@@ -40,7 +67,19 @@ const ProfilePage: React.FC = () => {
     const handleChangePassword = () => {
         setPasswordError('');
         setPasswordSuccess(false);
-        setPasswordError('Password change is not yet available. Please contact support.');
+        if (!oldPassword || !newPassword || !confirmNewPassword) {
+            setPasswordError('All password fields are required.');
+            return;
+        }
+        if (newPassword.length < 6) {
+            setPasswordError('New password must be at least 6 characters long.');
+            return;
+        }
+        if (newPassword !== confirmNewPassword) {
+            setPasswordError('New password and confirm password do not match.');
+            return;
+        }
+        setPasswordError('Password change from profile is not enabled yet. Use forgot password from login page.');
     };
 
     const handleDeleteAccount = async () => {
@@ -63,7 +102,6 @@ const ProfilePage: React.FC = () => {
                     <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>Manage your account and preferences</p>
                 </motion.div>
 
-                {/* API Usage Stats */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                     className="rounded-2xl p-6 mb-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                     <h3 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
@@ -75,7 +113,7 @@ const ProfilePage: React.FC = () => {
                             { label: 'Total Analyses', value: stats.totalAnalyses, color: '#0D7377' },
                             { label: 'High Risk Flagged', value: stats.highRiskDrugs, color: '#DC2626' },
                             { label: 'Avg Confidence', value: `${stats.avgConfidence}%`, color: '#D97706' },
-                            { label: 'VCF Files', value: analyses.length, color: '#7C3AED' },
+                            { label: 'VCF Files', value: stats.vcfFiles, color: '#7C3AED' },
                         ].map(s => (
                             <div key={s.label} className="text-center p-3 rounded-xl" style={{ background: 'var(--bg-muted)' }}>
                                 <p className="text-xl font-black" style={{ color: s.color }}>{s.value}</p>
@@ -85,7 +123,6 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </motion.div>
 
-                {/* Profile Info */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                     className="rounded-2xl p-6 mb-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                     <h3 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
@@ -106,7 +143,7 @@ const ProfilePage: React.FC = () => {
                             <div className="relative">
                                 <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
                                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none transition-all" style={inputStyle} {...focusHandlers} />
+                                    className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none transition-all" style={inputStyle} {...focusHandlers} disabled />
                             </div>
                         </div>
                         <div className="flex items-center gap-2 pt-1">
@@ -114,6 +151,7 @@ const ProfilePage: React.FC = () => {
                                 <Clock size={10} /> Member since: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                             </p>
                         </div>
+
                         <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} onClick={handleSaveProfile}
                             className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-white"
                             style={{ background: profileSaved ? '#059669' : '#0D7377' }}>
@@ -122,7 +160,6 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </motion.div>
 
-                {/* Change Password */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                     className="rounded-2xl p-6 mb-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                     <h3 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
@@ -166,7 +203,6 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </motion.div>
 
-                {/* Privacy Mode */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
                     className="rounded-2xl p-6 mb-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                     <div className="flex items-center justify-between">
@@ -190,7 +226,6 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </motion.div>
 
-                {/* Danger Zone */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                     className="rounded-2xl p-6" style={{ background: 'var(--bg-surface)', border: '1px solid #FECACA', boxShadow: 'var(--shadow-sm)' }}>
                     <h3 className="text-sm font-bold mb-2 flex items-center gap-2" style={{ color: '#DC2626' }}>

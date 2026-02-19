@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-    Menu, X, Sun, Moon, LogIn, LogOut, User,
+    Menu, X, LogIn, LogOut, User,
     Upload, Pill, LayoutDashboard, Info, FileText,
     ChevronDown, Settings, History, Shield, Dna
 } from 'lucide-react';
@@ -87,28 +87,32 @@ const Navbar: React.FC = () => {
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
                 <div className="flex items-center justify-between h-full">
-                    {/* Left — Logo */}
-                    <Link to="/" className="flex items-center gap-2.5 group perspective-1000">
+                    {/* Left -- Logo */}
+                    <Link to="/" className="flex items-center gap-2.5 group">
                         <motion.div
-                            whileHover={{ rotateY: 180 }}
-                            transition={{ type: 'spring', stiffness: 100, damping: 10 }}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm relative"
+                            className="w-10 h-10 rounded-xl flex items-center justify-center relative"
                             style={{
                                 background: 'linear-gradient(135deg, #0D7377, #0A5C5F)',
-                                transformStyle: 'preserve-3d',
-                                boxShadow: '0 4px 12px rgba(13,115,119,0.3)'
+                                boxShadow: '0 4px 12px rgba(13,115,119,0.3)',
                             }}
+                            whileHover={{ scale: 1.08 }}
+                            whileTap={{ scale: 0.95 }}
                         >
-                            <span style={{ backfaceVisibility: 'hidden' }}>PG</span>
-                            <span
-                                style={{
-                                    backfaceVisibility: 'hidden',
-                                    transform: 'rotateY(180deg)',
-                                    position: 'absolute'
-                                }}
+                            {/* Pulse ring */}
+                            <motion.div
+                                className="absolute inset-0 rounded-xl"
+                                style={{ border: '2px solid rgba(13,115,119,0.6)' }}
+                                animate={{ scale: [1, 1.35, 1.35], opacity: [0.6, 0, 0] }}
+                                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut' }}
+                            />
+                            {/* DNA icon */}
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                                style={{ color: '#fff' }}
                             >
-                                🧬
-                            </span>
+                                <Dna size={20} />
+                            </motion.div>
                         </motion.div>
                         <div className="transition-transform duration-300 group-hover:translate-x-1">
                             <p className="font-black text-sm leading-none tracking-tight" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
@@ -144,16 +148,7 @@ const Navbar: React.FC = () => {
                             CPIC Aligned
                         </div>
 
-                        {/* Theme Toggle */}
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={toggleTheme}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-                            style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}
-                        >
-                            {isDark ? <Sun size={15} /> : <Moon size={15} />}
-                        </motion.button>
+
 
                         {/* Auth section */}
                         {isAuthenticated ? (

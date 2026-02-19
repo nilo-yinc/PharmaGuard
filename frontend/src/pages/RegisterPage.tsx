@@ -40,7 +40,7 @@ const RegisterPage: React.FC = () => {
         setIsLoading(false);
 
         if (result.success) {
-            navigate('/dashboard', { replace: true });
+            navigate('/login?registered=1', { replace: true });
         } else {
             setError(result.error || 'Registration failed.');
         }

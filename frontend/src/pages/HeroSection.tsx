@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { ChevronDown, Dna, Shield, Zap, Brain } from 'lucide-react';
 import { BackgroundGrid, GeneHelixArt, MedicalCrossPattern } from '../components/HealthcareVisuals';
@@ -22,6 +22,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
     const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
     const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
 
+    // Typing animation for "Precision Medicine"
+    const fullText = 'Precision Medicine';
+    const [typed, setTyped] = useState('');
+    const [showCursor, setShowCursor] = useState(true);
+
+    useEffect(() => {
+        const startDelay = setTimeout(() => {
+            let i = 0;
+            const timer = setInterval(() => {
+                i++;
+                setTyped(fullText.slice(0, i));
+                if (i >= fullText.length) clearInterval(timer);
+            }, 150);
+            return () => clearInterval(timer);
+        }, 1000);
+        return () => clearTimeout(startDelay);
+    }, []);
+
+    useEffect(() => {
+        const blink = setInterval(() => setShowCursor(prev => !prev), 530);
+        return () => clearInterval(blink);
+    }, []);
+
     const stats = [
         { label: 'Genes Analyzed', value: '450+', icon: <Dna size={18} /> },
         { label: 'Drug Interactions', value: '12,000+', icon: <Zap size={18} /> },
@@ -35,7 +58,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                 id="hero"
                 ref={containerRef}
                 className="relative min-h-screen flex items-center justify-center overflow-hidden"
-                style={{ background: 'linear-gradient(180deg, rgba(13,115,119,0.06) 0%, var(--bg-main) 35%, var(--bg-muted) 100%)' }}
             >
                 {/* Background visuals (subtle, healthcare-themed) */}
                 <BackgroundGrid className="absolute inset-0" />
@@ -105,13 +127,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                             Personalized
                         </motion.span>
                         <br />
-                        <motion.span
-                            style={{ color: 'var(--primary)', display: 'inline-block' }}
-                            animate={{ y: [0, 5, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                        >
-                            Precision Medicine
-                        </motion.span>
+                        <span style={{ color: 'var(--primary)', display: 'inline-block' }}>
+                            {typed}
+                            <span
+                                style={{
+                                    display: 'inline-block',
+                                    width: '3px',
+                                    height: '0.85em',
+                                    background: 'var(--primary)',
+                                    marginLeft: '2px',
+                                    verticalAlign: 'baseline',
+                                    opacity: showCursor ? 1 : 0,
+                                    transition: 'opacity 0.1s',
+                                }}
+                            />
+                        </span>
                     </motion.h1>
 
                     {/* Subtitle */}

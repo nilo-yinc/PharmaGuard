@@ -37,9 +37,9 @@ const isLoggedIn = (req, res, next) => {
     next();
   } catch (error) {
     console.error("Error verifying token:", error);
-    return res.status(500).json({
+    return res.status(401).json({
       status: false,
-      message: "Internal server error",
+      message: "Unauthorized access",
     });
   }
 };

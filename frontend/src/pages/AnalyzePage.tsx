@@ -8,8 +8,8 @@ import {
 import VCFUpload from './VCFUpload';
 import DrugInput from './DrugInput';
 import { useAuth } from '../contexts/AuthContext';
-import { saveAnalysis } from '../services/storageService';
-import { MOCK_ANALYSIS_RESULT, SupportedDrug } from '../utils/mockData';
+import { analysisApi } from '../services/analysisApi';
+import { SupportedDrug } from '../utils/mockData';
 
 type Step = 1 | 2 | 3;
 
@@ -20,6 +20,7 @@ const AnalyzePage: React.FC = () => {
 
     const [currentStep, setCurrentStep] = useState<Step>(1);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [uploadedRecordId, setUploadedRecordId] = useState<string | null>(null);
     const [selectedDrugs, setSelectedDrugs] = useState<SupportedDrug[]>([]);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -46,6 +47,8 @@ const AnalyzePage: React.FC = () => {
     }, []);
 
     const handleAnalyze = useCallback(async (drugs: SupportedDrug[]) => {
+        if (!uploadedRecordId) return;
+
         setSelectedDrugs(drugs);
         setCurrentStep(3);
         setIsAnalyzing(true);
@@ -66,34 +69,18 @@ const AnalyzePage: React.FC = () => {
             setAnalysisProgress(phase.progress);
         }
 
-        // Save analysis to user storage
-        const filteredDrugs = drugs.length > 0
-            ? MOCK_ANALYSIS_RESULT.drugs.filter(d => drugs.map(s => s.toUpperCase()).includes(d.drug.toUpperCase()))
-            : MOCK_ANALYSIS_RESULT.drugs;
-
-        const avgConfidence = filteredDrugs.length > 0
-            ? Math.round(filteredDrugs.reduce((sum, d) => sum + d.confidence, 0) / filteredDrugs.length)
-            : 0;
-
-        if (user) {
-            const saved = saveAnalysis({
-                userId: user.id,
-                date: new Date().toISOString(),
-                vcfFileName: uploadedFile?.name || 'unknown.vcf',
-                drugsAnalyzed: drugs.length > 0 ? drugs : MOCK_ANALYSIS_RESULT.drugs.map(d => d.drug),
-                results: filteredDrugs,
-                analyzedGenes: MOCK_ANALYSIS_RESULT.analyzedGenes,
-                totalVariants: MOCK_ANALYSIS_RESULT.totalVariants,
-                overallRiskScore: MOCK_ANALYSIS_RESULT.overallRiskScore,
-                confidenceScore: avgConfidence,
-                sampleId: MOCK_ANALYSIS_RESULT.sampleId,
-            });
-
-            await new Promise(r => setTimeout(r, 600));
+        const { success, error } = await analysisApi.analyze(uploadedRecordId, drugs);
+        if (!success) {
             setIsAnalyzing(false);
-            navigate(`/report/${saved.id}`, { replace: true });
+            setCurrentStep(2);
+            alert(`Analysis failed: ${error || 'Unknown error'}`);
+            return;
         }
-    }, [user, uploadedFile, navigate]);
+
+        await new Promise(r => setTimeout(r, 300));
+        setIsAnalyzing(false);
+        navigate(`/report/${uploadedRecordId}`, { replace: true });
+    }, [uploadedRecordId, navigate]);
 
     return (
         <div className="min-h-[calc(100vh-64px)] pt-6 pb-12 px-4 sm:px-6 lg:px-8">
@@ -147,7 +134,10 @@ const AnalyzePage: React.FC = () => {
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <VCFUpload onFileAccepted={handleFileAccepted} />
+                            <VCFUpload
+                                onFileAccepted={handleFileAccepted}
+                                onRecordCreated={(recordId) => setUploadedRecordId(recordId)}
+                            />
                             {uploadedFile && (
                                 <div className="flex justify-center mt-4">
                                     <motion.button

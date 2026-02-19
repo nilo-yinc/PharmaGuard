@@ -3,10 +3,12 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./config/database');
 
 // Import routes
 const uploadRoutes = require('./routes/upload.routes');
+const userRoutes = require('../auth/routes/user.routes');
 
 // Load environment variables
 dotenv.config();
@@ -16,15 +18,29 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = (
+  process.env.FRONTEND_URL ||
+  'http://localhost:5173,http://localhost:3000'
+)
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Root route
 app.get('/', (req, res) => {
@@ -34,6 +50,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     database: 'MongoDB',
     endpoints: {
+      auth: 'POST /api/v1/users/login',
       upload: 'POST /api/v1/upload',
       records: 'GET /api/v1/records',
       patientRecord: 'GET /api/v1/records/:patientId',
@@ -53,6 +70,7 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/v1/users', userRoutes);
 app.use('/api/v1', uploadRoutes);
 
 // Error handling middleware
@@ -78,9 +96,11 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Express server running on http://localhost:${PORT}`);
-  console.log(`📚 Service: PharmaGuard Express API`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Express server running on http://localhost:${PORT}`);
+    console.log(`📚 Service: PharmaGuard Express API`);
+  });
+}
 
 module.exports = app;

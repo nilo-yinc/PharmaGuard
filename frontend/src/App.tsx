@@ -13,6 +13,7 @@ import UserDashboard from './pages/UserDashboard';
 import AnalyzePage from './pages/AnalyzePage';
 import ReportPage from './pages/ReportPage';
 import ProfilePage from './pages/ProfilePage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Handles the redirect back from Google OAuth
 const GoogleOAuthCallback: React.FC = () => {
@@ -69,6 +70,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               {/* Protected routes */}
               <Route path="/dashboard" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />

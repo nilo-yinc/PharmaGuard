@@ -8,11 +8,15 @@ import { SupportedDrug } from '../utils/mockData';
 import { Dna, FlaskConical, FileText } from 'lucide-react';
 import { CardSpotlight } from '../components/ui/card-spotlight';
 
+import { analysisApi } from '../services/analysisApi';
+
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [uploadedRecordId, setUploadedRecordId] = useState<string | null>(null);
     const [selectedDrugs, setSelectedDrugs] = useState<SupportedDrug[]>([]);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     const { scrollYProgress } = useScroll();
     const scaleX = useSpring(scrollYProgress, {
@@ -21,9 +25,32 @@ const LandingPage: React.FC = () => {
         restDelta: 0.001
     });
 
-    const handleAnalyze = (drugs: SupportedDrug[]) => {
+    const handleAnalyze = async (drugs: SupportedDrug[]) => {
+        if (!uploadedRecordId) {
+            alert('Please upload a VCF file first');
+            return;
+        }
         setSelectedDrugs(drugs);
-        navigate('/analyze');
+        setIsAnalyzing(true);
+
+        try {
+            const { success, data, error } = await analysisApi.analyze(uploadedRecordId, drugs);
+            if (success) {
+                // The backend might return the record again or just success.
+                // We navigate to /analyze/:recordId
+                // Wait, route is /analyze usually.
+                // But ReportPage looks for 'id' param? 
+                // "const { id } = useParams<{ id: string }>();"
+                // So we should navigate to `/report/${uploadedRecordId}`.
+                navigate(`/report/${uploadedRecordId}`);
+            } else {
+                alert(`Analysis failed: ${error}`);
+            }
+        } catch (e: any) {
+            alert(`Error: ${e.message}`);
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     useEffect(() => {
@@ -70,7 +97,10 @@ const LandingPage: React.FC = () => {
                 className="relative"
                 style={{ background: 'var(--bg-muted)', backdropFilter: 'var(--backdrop)', WebkitBackdropFilter: 'var(--backdrop)' }}
             >
-                <VCFUpload onFileAccepted={(file) => setUploadedFile(file)} />
+                <VCFUpload
+                    onFileAccepted={(file) => setUploadedFile(file)}
+                    onRecordCreated={(id) => setUploadedRecordId(id)}
+                />
             </motion.div>
 
             {/* Drug Input section */}

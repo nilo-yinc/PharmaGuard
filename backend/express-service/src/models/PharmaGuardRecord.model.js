@@ -43,12 +43,12 @@ const riskAssessmentSchema = new mongoose.Schema({
   confidence_score: {
     type: Number,
     min: 0,
-    max: 1,
+    max: 100,
     required: true
   },
   severity: {
     type: String,
-    enum: ['mild', 'moderate', 'severe', 'critical'],
+    enum: ['low', 'mild', 'moderate', 'high', 'severe', 'critical'],
     required: true
   }
 }, { _id: false });
@@ -67,14 +67,27 @@ const drugResultSchema = new mongoose.Schema({
     type: pharmacogenomicProfileSchema,
     required: true
   },
+  clinical_recommendation: {
+    action: {
+      type: String
+    },
+    details: {
+      type: String
+    }
+  },
   llm_generated_explanation: {
-    type: String,
+    type: mongoose.Schema.Types.Mixed,
     required: true
   }
 }, { _id: false });
 
 // Main PharmaGuardRecord schema
 const pharmaGuardRecordSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: [true, 'User ID is required'],
+    index: true,
+  },
   patientId: {
     type: String,
     required: [true, 'Patient ID is required'],
@@ -126,6 +139,7 @@ const pharmaGuardRecordSchema = new mongoose.Schema({
 // Indexes for better query performance
 pharmaGuardRecordSchema.index({ uploadTimestamp: -1 });
 pharmaGuardRecordSchema.index({ processingStatus: 1 });
+pharmaGuardRecordSchema.index({ userId: 1, uploadTimestamp: -1 });
 
 // Virtual for file size in MB
 pharmaGuardRecordSchema.virtual('fileSizeMB').get(function() {
@@ -147,24 +161,26 @@ pharmaGuardRecordSchema.methods.markAsFailed = function(errorMsg) {
 };
 
 // Static method to find by patient ID
-pharmaGuardRecordSchema.statics.findByPatientId = function(patientId) {
-  return this.findOne({ patientId });
+pharmaGuardRecordSchema.statics.findByPatientId = function(patientId, userId) {
+  const query = { patientId };
+  if (userId) query.userId = userId;
+  return this.findOne(query);
 };
 
 // Static method to get recent records
-pharmaGuardRecordSchema.statics.getRecentRecords = function(limit = 10) {
-  return this.find()
+pharmaGuardRecordSchema.statics.getRecentRecords = function(limit = 10, userId) {
+  const query = userId ? { userId } : {};
+  return this.find(query)
     .sort({ uploadTimestamp: -1 })
     .limit(limit)
     .select('-vcfBuffer'); // Exclude buffer from results
 };
 
 // Pre-save middleware to update processing status
-pharmaGuardRecordSchema.pre('save', function(next) {
+pharmaGuardRecordSchema.pre('save', function() {
   if (this.isNew) {
     this.processingStatus = 'pending';
   }
-  next();
 });
 
 const PharmaGuardRecord = mongoose.model('PharmaGuardRecord', pharmaGuardRecordSchema);

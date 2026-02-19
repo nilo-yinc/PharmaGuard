@@ -7,11 +7,14 @@ import {
 } from 'lucide-react';
 import { FileUploadDropzone } from '../components/ui/file-upload';
 
+import { analysisApi } from '../services/analysisApi';
+
 interface VCFUploadProps {
     onFileAccepted: (file: File) => void;
+    onRecordCreated?: (recordId: string) => void;
 }
 
-const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
+const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted, onRecordCreated }) => {
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [fileError, setFileError] = useState<string>('');
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -19,30 +22,44 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
     const [isSuccess, setIsSuccess] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
 
-    const mockVariants = Math.floor(Math.random() * 3000) + 1500;
+    const mockVariants = 450; // Approximated count
 
-    const processFile = useCallback((file: File) => {
+    const processFile = useCallback(async (file: File) => {
         setFileError('');
         setIsSuccess(false);
-        setUploadProgress(0);
+        setUploadProgress(10);
         setIsUploading(true);
 
-        let progress = 0;
+        // Simulate initial progress
         const interval = setInterval(() => {
-            progress += Math.random() * 15 + 5;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(interval);
+            setUploadProgress(prev => {
+                if (prev >= 90) return prev;
+                return prev + 10;
+            });
+        }, 500);
+
+        try {
+            const { success, recordId, error } = await analysisApi.uploadVCF(file);
+
+            clearInterval(interval);
+
+            if (success && recordId) {
                 setUploadProgress(100);
                 setIsUploading(false);
                 setIsSuccess(true);
                 setUploadedFile(file);
                 onFileAccepted(file);
+                onRecordCreated?.(recordId);
             } else {
-                setUploadProgress(Math.floor(progress));
+                throw new Error(error || 'Upload failed');
             }
-        }, 100);
-    }, [onFileAccepted]);
+        } catch (err: any) {
+            clearInterval(interval);
+            setIsUploading(false);
+            setUploadProgress(0);
+            setFileError(err.message || 'Failed to upload VCF file');
+        }
+    }, [onFileAccepted, onRecordCreated]);
 
     const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
         if (rejectedFiles.length > 0) {
@@ -291,12 +308,12 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         className="mt-6 p-6 rounded-2xl"
-                            style={{
-                                background: 'var(--bg-surface)',
-                                border: '1px solid var(--border)',
-                                boxShadow: 'var(--shadow-sm)',
-                            }}
-                        >
+                        style={{
+                            background: 'var(--bg-surface)',
+                            border: '1px solid var(--border)',
+                            boxShadow: 'var(--shadow-sm)',
+                        }}
+                    >
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                                 <FileText size={16} style={{ color: 'var(--primary)' }} />

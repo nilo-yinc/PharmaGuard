@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 
 interface ThemeContextType {
     isDark: boolean;
@@ -6,28 +6,19 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-    isDark: false,
+    isDark: true,
     toggleTheme: () => { },
 });
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [isDark, setIsDark] = useState(() => {
-        const saved = localStorage.getItem('pg_theme');
-        return saved ? saved === 'dark' : true; // default to dark
-    });
+    const isDark = true;
 
     useEffect(() => {
-        localStorage.setItem('pg_theme', isDark ? 'dark' : 'light');
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-            document.body.classList.remove('light');
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.body.classList.add('light');
-        }
-    }, [isDark]);
+        document.documentElement.classList.add('dark');
+        document.body.classList.remove('light');
+    }, []);
 
-    const toggleTheme = () => setIsDark(prev => !prev);
+    const toggleTheme = () => { };
 
     return (
         <ThemeContext.Provider value={{ isDark, toggleTheme }}>

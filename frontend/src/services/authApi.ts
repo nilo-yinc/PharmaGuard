@@ -2,7 +2,8 @@
 // Typed fetch wrapper for the Express auth backend at /api/v1/users/*
 // All requests include credentials (JWT cookie) automatically.
 
-const BASE = '/api/v1/users';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const BASE = API_BASE ? `${API_BASE}/api/v1/users` : '/api/v1/users';
 
 async function request<T>(
     method: string,
@@ -39,6 +40,7 @@ export interface ApiUser {
     email: string;
     phone?: string;
     profilePic?: string;
+    isVerified?: boolean;
     role?: string;
     createdAt?: string;
     lastLogin?: string;
@@ -54,6 +56,16 @@ interface AuthResponse {
 interface ProfileResponse {
     status: boolean;
     user?: ApiUser;
+}
+
+interface GenericResponse {
+    status: boolean;
+    message: string;
+    devOtp?: string;
+}
+
+interface VerifyOtpResponse extends GenericResponse {
+    resetToken?: string;
 }
 
 // ─── Auth Operations ────────────────────────────────────────────────────────
@@ -82,4 +94,20 @@ export async function apiGetProfile() {
 
 export async function apiUpdateProfile(updates: { name?: string; phone?: string; profilePic?: string }) {
     return request<ProfileResponse>('PUT', '/update-profile', updates);
+}
+
+export async function apiResendVerificationEmail() {
+    return request<GenericResponse>('POST', '/resend-verification');
+}
+
+export async function apiForgotPassword(email: string) {
+    return request<GenericResponse>('POST', '/forgot-password', { email });
+}
+
+export async function apiVerifyResetOtp(email: string, otp: string) {
+    return request<VerifyOtpResponse>('POST', '/verify-reset-otp', { email, otp });
+}
+
+export async function apiResetPassword(token: string, password: string) {
+    return request<GenericResponse>('POST', '/reset-password', { token, password });
 }

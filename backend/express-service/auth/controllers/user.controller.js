@@ -1,293 +1,331 @@
-const User = require("../models/user.models");
-// const { sendVerificationEmail } = require("../utils/sendingMail.utils");
-const jwt = require("jsonwebtoken");
+const User = require('../models/user.models');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const axios = require('axios');
+const jwksClient = require('jwks-rsa');
+const {
+  sendResetPasswordOtpEmail,
+} = require('../utils/sendingMail.utils');
 
-// Register user controller
+const getFrontendUrl = () => process.env.FRONTEND_URL || 'http://localhost:5173';
+
+const safeUserPayload = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  phone: user.phone,
+  profilePic: user.profilePic,
+  isVerified: user.isVerified,
+  role: user.role,
+  createdAt: user.createdAt,
+  lastLogin: user.updatedAt,
+});
+
+const generateRandomToken = () => crypto.randomBytes(24).toString('hex');
+const generateOtp = () => `${Math.floor(100000 + Math.random() * 900000)}`;
+const hashOtp = (otp) => crypto.createHash('sha256').update(otp).digest('hex');
+
+const createJwtForUser = (user) =>
+  jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRY || '24h',
+  });
+
+const setAuthCookie = (res, token) => {
+  res.cookie('jwtToken', token, {
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/',
+  });
+};
+
 const registerUser = async (req, res) => {
-  // 1. Get user data from request body
   const { name, email, password } = req.body;
 
-  // 2. validate the inputs
   if (!email || !name || !password) {
-    return res.status(400).json({
-      status: false,
-      message: "All fields are required",
-    });
+    return res.status(400).json({ status: false, message: 'All fields are required' });
   }
-
-  // password validation
   if (password.length < 6) {
-    return res.status(400).json({
-      status: false,
-      message: "Password must be at least 6 characters long",
-    });
+    return res.status(400).json({ status: false, message: 'Password must be at least 6 characters long' });
   }
 
   try {
-    // 3. Check if user already exists in DB
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
-      return res.status(400).json({
-        status: false,
-        message: "User already exists",
-      });
+      return res.status(400).json({ status: false, message: 'User already exists' });
     }
 
-    // 4. hashing of password is done in the User model using pre-save hook middleware
-
-    // 5. generate a verification token and expiry time
-    const verificationTokenExpiry = Date.now() + 10 * 60 * 1000;
-
-    // 6. now create a new user
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
-      verificationTokenExpiry: verificationTokenExpiry,
+      isVerified: true,
+      verificationToken: null,
+      verificationTokenExpiry: null,
     });
 
-    // 6. check if user is created
-    if (!user) {
-      return res.status(400).json({
-        status: false,
-        message: "User registration failed",
-      });
-    }
-    
-
-    // 7. verify the user email address by sending a token to the user's email address
-    // await sendVerificationEmail(user.email, user.verificationToken);
-
-    // 8. send response
     return res.status(201).json({
       status: true,
-      message: "User registered successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      message: 'User registered successfully.',
+      user: safeUserPayload(user),
     });
   } catch (error) {
-    console.error("User registration failed", error);
-    return res.status(500).json({
-      status: false,
-      message: error.message // "User registration failed",
-      
-    });
+    console.error('User registration failed', error);
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
-// Login user controller
 const login = async (req, res) => {
-  // 1. get user data from request body
   const { email, password } = req.body;
-
-  // 2. validate the inputs
   if (!email || !password) {
-    return res.status(400).json({
-      status: false,
-      message: "All fields are required",
-    });
+    return res.status(400).json({ status: false, message: 'All fields are required' });
   }
 
   try {
-    // 3. check if user exists in DB with the provided email
-    const user = await User.findOne({ email });
-
-    // 4. check if user exists
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
-      return res.status(400).json({
-        status: false,
-        message: "Invalid email or password",
-      });
+      return res.status(400).json({ status: false, message: 'Invalid email or password' });
     }
 
-    // 6. compare the password
     const isPasswordMatch = await user.comparePassword(password);
-
-    // 7. check if password is correct
     if (!isPasswordMatch) {
-      return res.status(400).json({
-        status: false,
-        message: "Invalid email or password",
-      });
+      return res.status(400).json({ status: false, message: 'Invalid email or password' });
     }
 
-    // 8. create a JWT token for the user to access protected routes
-    const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRY,
+    const jwtToken = createJwtForUser(user);
+    setAuthCookie(res, jwtToken);
+
+    return res.status(200).json({
+      status: true,
+      message: 'User logged in successfully',
+      token: jwtToken,
+      user: safeUserPayload(user),
+    });
+  } catch (error) {
+    console.error('User login failed', error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+    if (!token) {
+      return res.status(400).send('Invalid verification token');
+    }
+
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpiry: { $gt: new Date() },
     });
 
-    // 9. set cookie
-    const cookieOptions = {
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      path: '/',
-      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+    if (!user) {
+      return res.redirect(`${getFrontendUrl()}/login?error=verification_failed`);
+    }
+
+    user.isVerified = true;
+    user.verificationToken = null;
+    user.verificationTokenExpiry = null;
+    await user.save();
+
+    return res.redirect(`${getFrontendUrl()}/login?verified=1`);
+  } catch (error) {
+    console.error('Email verification failed', error);
+    return res.redirect(`${getFrontendUrl()}/login?error=verification_failed`);
+  }
+};
+
+const resendVerificationEmail = async (req, res) => {
+  try {
+    return res.status(200).json({ status: true, message: 'Email verification is not required.' });
+  } catch (error) {
+    console.error('Resend verification failed', error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ status: false, message: 'Email is required' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(200).json({
+        status: true,
+        message: 'If an account exists for this email, an OTP has been sent.',
+      });
+    }
+
+    const otp = generateOtp();
+    user.resetPasswordToken = hashOtp(otp);
+    user.resetPasswordTokenExpiry = Date.now() + 10 * 60 * 1000;
+    user.resetPasswordVerifiedToken = null;
+    user.resetPasswordVerifiedTokenExpiry = null;
+    await user.save();
+    const emailSent = await sendResetPasswordOtpEmail(user.email, otp);
+
+    const response = {
+      status: true,
+      message: 'If an account exists for this email, an OTP has been sent.',
     };
 
-    res.cookie("jwtToken", jwtToken, cookieOptions);
-
-    // 10. send response with token in body as fallback for cross-origin issues
-    return res.status(200).json({
-      status: true,
-      message: "User logged in successfully",
-      token: jwtToken,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        profilePic: user.profilePic
-      }
-    });
-  } catch (error) {
-    console.error("User login failed", error);
-    return res.status(500).json({
-      status: false,
-      message: error.message,  // Show actual error message
-      stack: error.stack        // Show stack trace
-    });
-  }
-};
-
-// get user profile controller
-const getProfile = async (req, res) => {
-  try {
-    // 1. get user id from request object
-    const userId = req.user.id;
-
-    // 2. find user by id
-    const user = await User.findById(userId).select("-password");
-
-    // check if user exists
-    if (!user) {
-      return res.status(401).json({
-        status: false,
-        message: "User not found",
-      });
+    // Local/dev fallback when SMTP is not configured.
+    if (!emailSent && process.env.NODE_ENV !== 'production') {
+      response.devOtp = otp;
     }
 
-    // 3. send response
-    return res.status(200).json({
-      status: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        profilePic: user.profilePic,
-        isVerified: user.isVerified,
-        role: user.role,
-      },
-    });
+    return res.status(200).json(response);
   } catch (error) {
-    console.error("Error getting user profile", error);
-    return res.status(500).json({
-      status: false,
-      message: "Error getting user profile",
-    });
+    console.error('Forgot password failed', error);
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
-// logout user controller
-const logout = async (req, res) => {
+const verifyResetOtp = async (req, res) => {
   try {
-    // 1. check if user is logged in
-    if (!req.user) {
-      return res.status(401).json({
-        status: false,
-        message: "Unauthorized access",
-      });
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ status: false, message: 'Email and OTP are required' });
     }
 
-    // 2. clear cookie
-    res.cookie("jwtToken", "", {
-      expires: new Date(Date.now()), // set the cookie to expire immediately after logout
-      httpOnly: true,
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({
+      email: normalizedEmail,
+      resetPasswordToken: hashOtp(String(otp).trim()),
+      resetPasswordTokenExpiry: { $gt: new Date() },
     });
-
-    // 3. send response
-    return res.status(200).json({
-      status: true,
-      message: "User logged out successfully",
-    });
-  } catch (error) {
-    console.error("User logout failed", error);
-    return res.status(500).json({
-      status: false,
-      message: "User logout failed",
-    });
-  }
-};
-
-// Update user profile controller
-const updateProfile = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { name, phone, profilePic, password } = req.body;
-    
-    const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({
-        status: false,
-        message: "User not found",
-      });
+      return res.status(400).json({ status: false, message: 'Invalid or expired OTP' });
     }
 
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (profilePic) user.profilePic = profilePic;
-    
-    if (password) {
-      if (password.length < 6) {
-        return res.status(400).json({
-          status: false,
-          message: "Password must be at least 6 characters long",
-        });
-      }
-      user.password = password; // Pre-save hook will hash it
-    }
-
+    const verifiedToken = generateRandomToken();
+    user.resetPasswordToken = null;
+    user.resetPasswordTokenExpiry = null;
+    user.resetPasswordVerifiedToken = verifiedToken;
+    user.resetPasswordVerifiedTokenExpiry = Date.now() + 10 * 60 * 1000;
     await user.save();
 
     return res.status(200).json({
       status: true,
-      message: "Profile updated successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        profilePic: user.profilePic,
-        role: user.role,
-      },
+      message: 'OTP verified successfully',
+      resetToken: verifiedToken,
     });
   } catch (error) {
-    console.error("Profile update failed", error);
-    return res.status(500).json({
-      status: false,
-      message: error.message || "Profile update failed",
+    console.error('Verify reset OTP failed', error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ status: false, message: 'Token and new password are required' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ status: false, message: 'Password must be at least 6 characters long' });
+    }
+
+    const user = await User.findOne({
+      resetPasswordVerifiedToken: token,
+      resetPasswordVerifiedTokenExpiry: { $gt: new Date() },
     });
+
+    if (!user) {
+      return res.status(400).json({ status: false, message: 'Invalid or expired reset token' });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = null;
+    user.resetPasswordTokenExpiry = null;
+    user.resetPasswordVerifiedToken = null;
+    user.resetPasswordVerifiedTokenExpiry = null;
+    await user.save();
+
+    return res.status(200).json({ status: true, message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Reset password failed', error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(401).json({ status: false, message: 'User not found' });
+    }
+    return res.status(200).json({ status: true, user: safeUserPayload(user) });
+  } catch (error) {
+    console.error('Error getting user profile', error);
+    return res.status(500).json({ status: false, message: 'Error getting user profile' });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ status: false, message: 'Unauthorized access' });
+    }
+    res.cookie('jwtToken', '', {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+      path: '/',
+    });
+    return res.status(200).json({ status: true, message: 'User logged out successfully' });
+  } catch (error) {
+    console.error('User logout failed', error);
+    return res.status(500).json({ status: false, message: 'User logout failed' });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ status: false, message: 'User not found' });
+    }
+
+    const { name, phone, profilePic, password } = req.body;
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (profilePic) user.profilePic = profilePic;
+    if (password) {
+      if (password.length < 6) {
+        return res.status(400).json({ status: false, message: 'Password must be at least 6 characters long' });
+      }
+      user.password = password;
+    }
+
+    await user.save();
+    return res.status(200).json({
+      status: true,
+      message: 'Profile updated successfully',
+      user: safeUserPayload(user),
+    });
+  } catch (error) {
+    console.error('Profile update failed', error);
+    return res.status(500).json({ status: false, message: error.message || 'Profile update failed' });
   }
 };
 
 // ─── Google OAuth (OpenID Connect) ───────────────────────────────────────────
 
-const crypto = require("crypto");
-const axios = require("axios");
-const jwksClient = require("jwks-rsa");
-
-const generateState = () => crypto.randomBytes(32).toString("hex");
-const generateNonce = () => crypto.randomBytes(32).toString("hex");
+const generateState = () => crypto.randomBytes(32).toString('hex');
+const generateNonce = () => crypto.randomBytes(32).toString('hex');
 
 const getJwksClient = () => {
   return jwksClient({
-    jwksUri: process.env.GOOGLE_JWKS_URL || "https://www.googleapis.com/oauth2/v3/certs",
+    jwksUri: process.env.GOOGLE_JWKS_URL || 'https://www.googleapis.com/oauth2/v3/certs',
     cache: true,
     rateLimit: true,
   });
@@ -305,15 +343,14 @@ const getSigningKey = async (kid) => {
 
 const verifyGoogleToken = async (token) => {
   const decoded = jwt.decode(token, { complete: true });
-  if (!decoded) throw new Error("Invalid token");
+  if (!decoded) throw new Error('Invalid token');
   const signingKey = await getSigningKey(decoded.header.kid);
   return jwt.verify(token, signingKey, {
-    algorithms: ["RS256"],
+    algorithms: ['RS256'],
     audience: process.env.GOOGLE_CLIENT_ID,
   });
 };
 
-// Step 1: Redirect user to Google consent screen
 const googleLogin = (req, res) => {
   const state = generateState();
   const nonce = generateNonce();
@@ -321,11 +358,11 @@ const googleLogin = (req, res) => {
   const cookieOpts = {
     httpOnly: true,
     maxAge: 600000,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
   };
-  res.cookie("oauth_state", state, cookieOpts);
-  res.cookie("oauth_nonce", nonce, cookieOpts);
+  res.cookie('oauth_state', state, cookieOpts);
+  res.cookie('oauth_nonce', nonce, cookieOpts);
 
   const redirectUri = process.env.GOOGLE_REDIRECT_URI;
   const googleAuthUrl =
@@ -342,103 +379,89 @@ const googleLogin = (req, res) => {
   res.redirect(googleAuthUrl);
 };
 
-// Step 2: Handle Google callback
 const googleCallback = async (req, res) => {
   try {
     const { code, state } = req.query;
     const savedState = req.cookies.oauth_state;
     const savedNonce = req.cookies.oauth_nonce;
 
-    res.clearCookie("oauth_state");
-    res.clearCookie("oauth_nonce");
+    res.clearCookie('oauth_state');
+    res.clearCookie('oauth_nonce');
 
     if (!state || !savedState || state !== savedState) {
-      return res.status(401).json({ status: false, message: "Invalid state parameter" });
+      return res.status(401).json({ status: false, message: 'Invalid state parameter' });
     }
 
-    // Exchange code for tokens
-    const tokenResponse = await axios.post(
-      "https://oauth2.googleapis.com/token",
-      null,
-      {
-        params: {
-          client_id: process.env.GOOGLE_CLIENT_ID,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-          code,
-          grant_type: "authorization_code",
-        },
-      }
-    );
+    const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', null, {
+      params: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        code,
+        grant_type: 'authorization_code',
+      },
+    });
 
     const { id_token, refresh_token } = tokenResponse.data;
     if (!id_token) {
-      return res.status(401).json({ status: false, message: "No ID token received" });
+      return res.status(401).json({ status: false, message: 'No ID token received' });
     }
 
-    // Verify the ID token with JWKS
     const decodedToken = await verifyGoogleToken(id_token);
     if (!decodedToken) {
-      return res.status(401).json({ status: false, message: "Invalid ID token" });
+      return res.status(401).json({ status: false, message: 'Invalid ID token' });
     }
-
-    // Validate nonce
     if (!decodedToken.nonce || decodedToken.nonce !== savedNonce) {
-      return res.status(401).json({ status: false, message: "Invalid nonce" });
+      return res.status(401).json({ status: false, message: 'Invalid nonce' });
     }
 
-    // Find or create user
     let user = await User.findOne({ googleId: decodedToken.sub });
     if (!user) {
-      // Also check by email so existing users can link their Google account
       user = await User.findOne({ email: decodedToken.email });
       if (user) {
-        // Link Google ID to existing user
         user.googleId = decodedToken.sub;
+        user.isVerified = true;
         if (!user.profilePic && decodedToken.picture) user.profilePic = decodedToken.picture;
         if (refresh_token) user.refreshToken = refresh_token;
         await user.save();
       } else {
-        // Create new user
         user = await User.create({
           googleId: decodedToken.sub,
           email: decodedToken.email,
-          name: decodedToken.name || decodedToken.email.split("@")[0],
-          profilePic: decodedToken.picture || "",
+          name: decodedToken.name || decodedToken.email.split('@')[0],
+          profilePic: decodedToken.picture || '',
           refreshToken: refresh_token || null,
+          isVerified: true,
         });
       }
     } else if (refresh_token) {
-      // Update refresh token if Google issued a new one
       user.refreshToken = refresh_token;
       await user.save();
     }
 
-    // Generate JWT (same format as existing login)
-    const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRY || "24h",
-    });
+    const jwtToken = createJwtForUser(user);
+    setAuthCookie(res, jwtToken);
 
-    // Set cookie
-    const cookieOptions = {
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      path: "/",
-    };
-    res.cookie("jwtToken", jwtToken, cookieOptions);
-
-    // Redirect to frontend with token in URL (frontend will parse it)
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     return res.redirect(
-      `${frontendUrl}/auth/google/callback?token=${jwtToken}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&id=${user._id}`
+      `${getFrontendUrl()}/auth/google/callback?token=${jwtToken}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&id=${user._id}`
     );
   } catch (error) {
-    console.error("Google OAuth Callback Error:", error.response?.data || error.message);
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    return res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+    console.error('Google OAuth Callback Error:', error.response?.data || error.message);
+    return res.redirect(`${getFrontendUrl()}/login?error=google_auth_failed`);
   }
 };
 
-module.exports = { registerUser, login, getProfile, logout, updateProfile, googleLogin, googleCallback };
+module.exports = {
+  registerUser,
+  login,
+  verifyEmail,
+  resendVerificationEmail,
+  forgotPassword,
+  verifyResetOtp,
+  resetPassword,
+  getProfile,
+  logout,
+  updateProfile,
+  googleLogin,
+  googleCallback,
+};

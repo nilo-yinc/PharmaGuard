@@ -51,11 +51,11 @@ const UserDashboard: React.FC = () => {
 
     const getRiskBadge = (level: string) => {
         const map: Record<string, { bg: string; text: string; label: string }> = {
-            toxic: { bg: '#FEF2F2', text: '#DC2626', label: 'Toxic' },
-            adjust: { bg: '#FFFBEB', text: '#D97706', label: 'Adjust' },
-            safe: { bg: '#ECFDF5', text: '#059669', label: 'Safe' },
-            ineffective: { bg: '#EFF6FF', text: '#2563EB', label: 'Ineffective' },
-            unknown: { bg: '#F9FAFB', text: '#6B7280', label: 'Unknown' },
+            toxic: { bg: 'var(--danger-light)', text: 'var(--danger)', label: 'Toxic' },
+            adjust: { bg: 'var(--warning-light)', text: 'var(--warning)', label: 'Adjust' },
+            safe: { bg: 'var(--success-light)', text: 'var(--success)', label: 'Safe' },
+            ineffective: { bg: 'var(--info-light)', text: 'var(--info)', label: 'Ineffective' },
+            unknown: { bg: 'var(--bg-muted)', text: 'var(--text-secondary)', label: 'Unknown' },
         };
         const m = map[level] || map.unknown;
         return (
@@ -66,9 +66,9 @@ const UserDashboard: React.FC = () => {
     };
 
     const statCards = [
-        { label: 'Total Analyses', value: stats.totalAnalyses, icon: <BarChart3 size={18} />, color: '#0D7377', bg: '#E6F5F5' },
-        { label: 'High Risk Drugs', value: stats.highRiskDrugs, icon: <AlertTriangle size={18} />, color: '#DC2626', bg: '#FEF2F2' },
-        { label: 'Avg Confidence', value: `${stats.avgConfidence}%`, icon: <Gauge size={18} />, color: '#D97706', bg: '#FFFBEB' },
+        { label: 'Total Analyses', value: stats.totalAnalyses, icon: <BarChart3 size={18} />, color: 'var(--primary)', bg: 'var(--primary-light)' },
+        { label: 'High Risk Drugs', value: stats.highRiskDrugs, icon: <AlertTriangle size={18} />, color: 'var(--danger)', bg: 'var(--danger-light)' },
+        { label: 'Avg Confidence', value: `${stats.avgConfidence}%`, icon: <Gauge size={18} />, color: 'var(--warning)', bg: 'var(--warning-light)' },
     ];
 
     const lastLogin = user?.lastLogin
@@ -98,7 +98,7 @@ const UserDashboard: React.FC = () => {
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
                                 className="px-5 py-2.5 rounded-xl text-sm font-semibold"
-                                style={{ background: 'white', color: '#0D7377' }}
+                                style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.3)' }}
                             >
                                 + New Analysis
                             </motion.button>
@@ -150,7 +150,7 @@ const UserDashboard: React.FC = () => {
                                             <stop offset="95%" stopColor="#0D7377" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                                     <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#9CA3AF' }} />
                                     <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} domain={[0, 100]} />
                                     <Tooltip contentStyle={{ fontSize: 11, borderRadius: 12, border: '1px solid #E5E7EB' }} />
@@ -212,13 +212,13 @@ const UserDashboard: React.FC = () => {
                     {filteredAnalyses.length === 0 ? (
                         <div className="text-center py-16">
                             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                                style={{ background: '#F3F4F6' }}>
-                                <Pill size={24} style={{ color: '#9CA3AF' }} />
+                                style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}>
+                                <Pill size={24} style={{ color: 'var(--text-muted)' }} />
                             </div>
-                            <p className="text-sm font-medium" style={{ color: '#6B7280' }}>
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                                 {analyses.length === 0 ? 'No analyses yet' : 'No results match your filter'}
                             </p>
-                            <p className="text-xs mt-1" style={{ color: '#9CA3AF' }}>
+                            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                                 {analyses.length === 0 ? 'Run your first analysis to see results here.' : 'Try adjusting your search or filter.'}
                             </p>
                             {analyses.length === 0 && (
@@ -268,22 +268,22 @@ const UserDashboard: React.FC = () => {
                                         <div className="flex flex-wrap gap-1 mb-3">
                                             {analysis.drugsAnalyzed.slice(0, 4).map(d => (
                                                 <span key={d} className="px-1.5 py-0.5 rounded text-[9px] font-medium"
-                                                    style={{ background: '#E6F5F5', color: '#0D7377' }}>
+                                                    style={{ background: 'var(--primary-light)', color: 'var(--primary)' }}>
                                                     {d}
                                                 </span>
                                             ))}
                                             {analysis.drugsAnalyzed.length > 4 && (
-                                                <span className="px-1.5 py-0.5 rounded text-[9px]" style={{ background: '#F3F4F6', color: '#6B7280' }}>
+                                                <span className="px-1.5 py-0.5 rounded text-[9px]" style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}>
                                                     +{analysis.drugsAnalyzed.length - 4}
                                                 </span>
                                             )}
                                         </div>
 
                                         {/* Actions */}
-                                        <div className="flex items-center gap-2" style={{ borderTop: '1px solid #F3F4F6', paddingTop: '0.5rem' }}>
+                                        <div className="flex items-center gap-2" style={{ borderTop: '1px solid var(--border)', paddingTop: '0.5rem' }}>
                                             <Link to={`/report/${analysis.id}`} className="flex-1">
-                                                <button className="w-full flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-semibold transition-colors hover:bg-teal-50"
-                                                    style={{ color: '#0D7377', background: '#E6F5F5' }}>
+                                                <button className="w-full flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-semibold transition-colors"
+                                                    style={{ color: 'var(--primary)', background: 'var(--primary-light)', border: '1px solid var(--primary)' }}>
                                                     <Eye size={11} /> View
                                                 </button>
                                             </Link>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
     Menu, X, Sun, Moon, LogIn, LogOut, User,
     Upload, Pill, LayoutDashboard, Info, FileText,
@@ -12,10 +12,21 @@ import { useAuth } from '../contexts/AuthContext';
 const Navbar: React.FC = () => {
     const { isDark, toggleTheme } = useTheme();
     const { user, isAuthenticated, logout } = useAuth();
+    const location = useLocation();
     const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -29,11 +40,11 @@ const Navbar: React.FC = () => {
     }, []);
 
     const navLinks = [
-        { to: '/analyze', label: 'Upload VCF', icon: <Upload size={14} /> },
-        { to: '/analyze', label: 'Drug Input', icon: <Pill size={14} /> },
-        { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} /> },
-        { to: '/#about', label: 'About', icon: <Info size={14} /> },
-        { to: '#', label: 'Docs', icon: <FileText size={14} /> },
+        { to: '/analyze?step=1', label: 'Upload VCF', icon: <Upload size={14} />, key: 'upload' },
+        { to: '/analyze?step=2', label: 'Drug Input', icon: <Pill size={14} />, key: 'drugs' },
+        { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} />, key: 'dashboard' },
+        { to: '/?section=about', label: 'About', icon: <Info size={14} />, key: 'about' },
+        { to: '/?section=docs', label: 'Docs', icon: <FileText size={14} />, key: 'docs' },
     ];
 
     const handleLogout = () => {
@@ -42,38 +53,66 @@ const Navbar: React.FC = () => {
         navigate('/');
     };
 
+    const currentSection = new URLSearchParams(location.search).get('section') || location.hash.replace('#', '');
+    const currentStep = new URLSearchParams(location.search).get('step');
+
+    const isCustomActive = (linkKey: string, isPathActive: boolean) => {
+        if (linkKey === 'upload') return location.pathname === '/analyze' && (currentStep === null || currentStep === '1');
+        if (linkKey === 'drugs') return location.pathname === '/analyze' && currentStep === '2';
+        if (linkKey === 'about') return location.pathname === '/' && currentSection === 'about';
+        if (linkKey === 'docs') return location.pathname === '/' && currentSection === 'docs';
+        return isPathActive;
+    };
+
     const navLinkStyle = (isActive: boolean) => ({
-        color: isActive ? '#0D7377' : '#6B7280',
+        color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
         fontWeight: isActive ? 600 : 500,
     });
 
     return (
         <nav
-            className="sticky top-0 z-50 backdrop-blur-md"
+            className="sticky top-0 z-50 transition-all duration-300"
             style={{
-                background: 'var(--bg-surface)',
-                borderBottom: '1px solid var(--border)',
+                background: isDark
+                    ? scrolled ? 'rgba(0, 4, 8, 0.92)' : 'rgba(0, 4, 8, 0.82)'
+                    : scrolled ? 'rgba(255, 255, 255, 0.92)' : 'rgba(240, 248, 255, 0.82)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
+                boxShadow: scrolled
+                    ? isDark ? '0 4px 20px rgba(0,0,0,0.6)' : '0 4px 20px rgba(13,115,119,0.1)'
+                    : 'none',
+                height: scrolled ? '60px' : '72px'
             }}
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                <div className="flex items-center justify-between h-full">
                     {/* Left — Logo */}
-                    <Link to="/" className="flex items-center gap-2.5 group">
-                        <div
-                            className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm transition-transform group-hover:scale-105"
-                            style={{ background: 'linear-gradient(135deg, #0D7377, #0A5C5F)' }}
+                    <Link to="/" className="flex items-center gap-2.5 group perspective-1000">
+                        <motion.div
+                            whileHover={{ rotateY: 180 }}
+                            transition={{ type: 'spring', stiffness: 100, damping: 10 }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm relative"
+                            style={{
+                                background: 'linear-gradient(135deg, #0D7377, #0A5C5F)',
+                                transformStyle: 'preserve-3d',
+                                boxShadow: '0 4px 12px rgba(13,115,119,0.3)'
+                            }}
                         >
-                            PG
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-1.5">
-                                <p className="font-bold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
-                                <div className="hidden sm:flex items-center justify-center w-5 h-5 rounded-md"
-                                    style={{ background: 'var(--primary-light)', border: '1px solid var(--border)', color: 'var(--primary)' }}>
-                                    <Dna size={12} />
-                                </div>
-                            </div>
-                            <p className="text-[9px] leading-tight" style={{ color: 'var(--text-secondary)' }}>Pharmacogenomics AI</p>
+                            <span style={{ backfaceVisibility: 'hidden' }}>PG</span>
+                            <span
+                                style={{
+                                    backfaceVisibility: 'hidden',
+                                    transform: 'rotateY(180deg)',
+                                    position: 'absolute'
+                                }}
+                            >
+                                🧬
+                            </span>
+                        </motion.div>
+                        <div className="transition-transform duration-300 group-hover:translate-x-1">
+                            <p className="font-black text-sm leading-none tracking-tight" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
+                            <p className="text-[9px] leading-tight font-medium" style={{ color: 'var(--text-secondary)' }}>Pharmacogenomics AI</p>
                         </div>
                     </Link>
 
@@ -83,11 +122,11 @@ const Navbar: React.FC = () => {
                             <NavLink
                                 key={link.label}
                                 to={link.to}
-                                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 hover:opacity-80"
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 hover:opacity-95"
                                 style={({ isActive }) => ({
-                                    color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-                                    fontWeight: isActive ? 600 : 500,
-                                    background: isActive ? 'var(--bg-muted)' : 'transparent'
+                                    color: isCustomActive(link.key, isActive) ? 'var(--primary)' : 'var(--text-secondary)',
+                                    fontWeight: isCustomActive(link.key, isActive) ? 600 : 500,
+                                    background: isCustomActive(link.key, isActive) ? 'var(--bg-muted)' : 'transparent'
                                 })}
                             >
                                 {link.icon}
@@ -100,7 +139,7 @@ const Navbar: React.FC = () => {
                     <div className="flex items-center gap-2">
                         {/* CPIC Badge */}
                         <div className="hidden lg:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium"
-                            style={{ background: '#ECFDF5', border: '1px solid #D1FAE5', color: '#059669' }}>
+                            style={{ background: 'var(--success-light)', border: '1px solid var(--success)', color: 'var(--success)' }}>
                             <Shield size={10} />
                             CPIC Aligned
                         </div>
@@ -230,7 +269,7 @@ const Navbar: React.FC = () => {
                                     to={link.to}
                                     onClick={() => setMobileOpen(false)}
                                     className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors"
-                                    style={({ isActive }) => navLinkStyle(isActive)}
+                                    style={({ isActive }) => navLinkStyle(isCustomActive(link.key, isActive))}
                                 >
                                     {link.icon}
                                     {link.label}

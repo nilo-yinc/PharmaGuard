@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     Upload, Pill, Play, CheckCircle, ArrowRight,
-    ArrowLeft, FileText, Dna, Loader2
+    ArrowLeft, Dna
 } from 'lucide-react';
 import VCFUpload from './VCFUpload';
 import DrugInput from './DrugInput';
@@ -16,12 +16,19 @@ type Step = 1 | 2 | 3;
 const AnalyzePage: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const [currentStep, setCurrentStep] = useState<Step>(1);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [selectedDrugs, setSelectedDrugs] = useState<SupportedDrug[]>([]);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisProgress, setAnalysisProgress] = useState(0);
+
+    useEffect(() => {
+        const step = searchParams.get('step');
+        if (step === '2') setCurrentStep(2);
+        if (step === '1') setCurrentStep(1);
+    }, [searchParams]);
 
     const steps = [
         { num: 1, label: 'Upload VCF', icon: <Upload size={16} />, desc: 'Upload your genomic variant file' },

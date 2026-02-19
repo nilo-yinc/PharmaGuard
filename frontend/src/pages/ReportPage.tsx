@@ -26,13 +26,13 @@ const ReportPage: React.FC = () => {
         return (
             <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">
                 <div className="text-center">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#FEF2F2' }}>
-                        <AlertTriangle size={24} style={{ color: '#DC2626' }} />
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)' }}>
+                        <AlertTriangle size={24} style={{ color: 'var(--danger)' }} />
                     </div>
-                    <h2 className="text-lg font-bold mb-2" style={{ color: '#1F2937' }}>Report Not Found</h2>
-                    <p className="text-sm mb-4" style={{ color: '#6B7280' }}>This analysis report doesn't exist or has been deleted.</p>
+                    <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Report Not Found</h2>
+                    <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>This analysis report doesn't exist or has been deleted.</p>
                     <Link to="/dashboard">
-                        <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white" style={{ background: '#0D7377' }}>
+                        <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white" style={{ background: 'var(--primary)' }}>
                             Back to Dashboard
                         </button>
                     </Link>
@@ -88,10 +88,10 @@ const ReportPage: React.FC = () => {
         { id: 'json' as TabId, label: 'Raw JSON', icon: <Code size={13} /> },
     ];
 
-    const getRiskColor = (level: string) => RISK_COLORS[level] || '#6B7280';
+    const getRiskColor = (level: string) => RISK_COLORS[level] || 'var(--text-secondary)';
     const getRiskBg = (level: string) => {
-        const map: Record<string, string> = { toxic: '#FEF2F2', adjust: '#FFFBEB', safe: '#ECFDF5', ineffective: '#EFF6FF', unknown: '#F9FAFB' };
-        return map[level] || '#F9FAFB';
+        const map: Record<string, string> = { toxic: 'var(--danger-light)', adjust: 'var(--warning-light)', safe: 'var(--success-light)', ineffective: 'var(--info-light)', unknown: 'var(--bg-muted)' };
+        return map[level] || 'var(--bg-muted)';
     };
 
     return (

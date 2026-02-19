@@ -70,25 +70,25 @@ const ClinicalDecisionPanel: React.FC = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="rounded-2xl overflow-hidden"
-                    style={{ border: '1px solid #FECACA' }}
+                    style={{ border: '1px solid var(--danger)' }}
                 >
                     <div
                         className="px-5 py-3 flex items-center gap-3"
-                        style={{ background: '#FEF2F2' }}
+                        style={{ background: 'var(--danger-light)' }}
                     >
-                        <AlertTriangle size={18} style={{ color: '#DC2626' }} />
+                        <AlertTriangle size={18} style={{ color: 'var(--danger)' }} />
                         <div className="flex-1">
-                            <p className="text-sm font-bold" style={{ color: '#DC2626' }}>
+                            <p className="text-sm font-bold" style={{ color: 'var(--danger)' }}>
                                 ⚠ Critical Safety Alert — {criticalDrugs.length} Drug{criticalDrugs.length > 1 ? 's' : ''} Contraindicated
                             </p>
-                            <p className="text-[10px]" style={{ color: '#DC262680' }}>Immediate action required · CPIC Grade A</p>
+                            <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>Immediate action required · CPIC Grade A</p>
                         </div>
-                        <div className="w-2 h-2 rounded-full" style={{ background: '#DC2626' }} />
+                        <div className="w-2 h-2 rounded-full" style={{ background: 'var(--danger)' }} />
                     </div>
-                    <div className="p-4 space-y-2" style={{ background: '#FEF2F2' }}>
+                    <div className="p-4 space-y-2" style={{ background: 'var(--danger-light)' }}>
                         {criticalDrugs.map(d => (
-                            <p key={d.drug} className="text-xs" style={{ color: '#6B7280' }}>
-                                <span className="font-bold" style={{ color: '#DC2626' }}>{d.drug}:</span> {d.recommendation}
+                            <p key={d.drug} className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                <span className="font-bold" style={{ color: 'var(--danger)' }}>{d.drug}:</span> {d.recommendation}
                             </p>
                         ))}
                     </div>

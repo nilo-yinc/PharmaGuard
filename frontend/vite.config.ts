@@ -7,6 +7,8 @@ export default defineConfig({
     alias: {
       '@': '/src',
     },
+    // Resolve .tsx/.ts before .js so TypeScript files take priority over compiled JS duplicates
+    extensions: ['.mjs', '.mts', '.tsx', '.ts', '.jsx', '.js', '.json', '.vue'],
   },
   server: {
     proxy: {

@@ -1,33 +1,60 @@
-import React from 'react';
-import './App.css';
+import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
+import MainLayout from './layouts/MainLayout';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoadingScreen from './pages/LoadingScreen';
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import UserDashboard from './pages/UserDashboard';
+import AnalyzePage from './pages/AnalyzePage';
+import ReportPage from './pages/ReportPage';
+import ProfilePage from './pages/ProfilePage';
 
-const App: React.FC = () => {
+function App() {
+  const [showLoading, setShowLoading] = useState(() => {
+    // Only show loading once per session
+    const hasLoaded = sessionStorage.getItem('pg_loaded');
+    return !hasLoaded;
+  });
+
+  const handleLoadingComplete = () => {
+    sessionStorage.setItem('pg_loaded', 'true');
+    setShowLoading(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>PharmaGuard HealthTech</h1>
-        <p>Healthcare Management System</p>
-        <div className="features">
-          <div className="feature-card">
-            <h2>👥 Patient Management</h2>
-            <p>Manage patient records and information</p>
-          </div>
-          <div className="feature-card">
-            <h2>💊 Medication Tracking</h2>
-            <p>Track medications and prescriptions</p>
-          </div>
-          <div className="feature-card">
-            <h2>📋 Prescription System</h2>
-            <p>Create and manage prescriptions</p>
-          </div>
-          <div className="feature-card">
-            <h2>📦 Inventory Control</h2>
-            <p>Monitor medication inventory levels</p>
-          </div>
-        </div>
-      </header>
-    </div>
+    <ThemeProvider>
+      <AuthProvider>
+        {/* Loading Screen — only once per session */}
+        <AnimatePresence>
+          {showLoading && (
+            <LoadingScreen onComplete={handleLoadingComplete} />
+          )}
+        </AnimatePresence>
+
+        {!showLoading && (
+          <Routes>
+            <Route element={<MainLayout />}>
+              {/* Public routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+              {/* Routes (auth disabled for dev) */}
+              <Route path="/dashboard" element={<UserDashboard />} />
+              <Route path="/analyze" element={<AnalyzePage />} />
+              <Route path="/report/:id" element={<ReportPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+          </Routes>
+        )}
+      </AuthProvider>
+    </ThemeProvider>
   );
-};
+}
 
 export default App;

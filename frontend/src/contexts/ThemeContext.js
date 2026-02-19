@@ -7,7 +7,7 @@ const ThemeContext = createContext({
 export const ThemeProvider = ({ children }) => {
     const [isDark, setIsDark] = useState(() => {
         const saved = localStorage.getItem('pg_theme');
-        return saved ? saved === 'dark' : false; // default to light
+        return saved ? saved === 'dark' : true; // default to dark
     });
     useEffect(() => {
         localStorage.setItem('pg_theme', isDark ? 'dark' : 'light');

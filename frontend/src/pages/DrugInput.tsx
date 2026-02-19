@@ -64,7 +64,7 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                 className="text-center mb-12"
             >
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-4"
-                    style={{ background: '#FEF0EF', border: '1px solid #FDE1DF', color: '#E8645A' }}
+                    style={{ background: 'var(--accent-light)', border: '1px solid var(--accent)', color: 'var(--accent)' }}
                 >
                     <FlaskConical size={12} />
                     Step 2 of 2
@@ -259,7 +259,7 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4 text-xs"
-                            style={{ background: '#FFFBEB', border: '1px solid #FDE68A', color: '#D97706' }}
+                            style={{ background: 'var(--warning-light)', border: '1px solid var(--warning)', color: 'var(--warning)' }}
                         >
                             {!hasFile && '⚠ Upload a VCF file first. '}
                             {selectedDrugs.length === 0 && '⚠ Select at least one drug.'}
@@ -276,9 +276,9 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                     className="w-full py-4 rounded-xl font-semibold text-sm transition-all duration-200 relative overflow-hidden"
                     style={{
                         background: hasFile && selectedDrugs.length > 0
-                            ? '#E8645A'
-                            : '#F3F4F6',
-                        color: hasFile && selectedDrugs.length > 0 ? '#fff' : '#9CA3AF',
+                            ? 'var(--accent)'
+                            : 'var(--bg-muted)',
+                        color: hasFile && selectedDrugs.length > 0 ? '#fff' : 'var(--text-muted)',
                         boxShadow: hasFile && selectedDrugs.length > 0 ? '0 4px 14px rgba(232,100,90,0.25)' : 'none',
                         cursor: hasFile && selectedDrugs.length > 0 ? 'pointer' : 'not-allowed',
                     }}

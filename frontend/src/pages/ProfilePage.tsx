@@ -154,12 +154,12 @@ const ProfilePage: React.FC = () => {
                     </h3>
 
                     {passwordError && (
-                        <div className="px-4 py-3 rounded-xl text-xs mb-4" style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626' }}>
+                        <div className="px-4 py-3 rounded-xl text-xs mb-4" style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', color: 'var(--danger)' }}>
                             {passwordError}
                         </div>
                     )}
                     {passwordSuccess && (
-                        <div className="px-4 py-3 rounded-xl text-xs mb-4" style={{ background: '#ECFDF5', border: '1px solid #D1FAE5', color: '#059669' }}>
+                        <div className="px-4 py-3 rounded-xl text-xs mb-4" style={{ background: 'var(--success-light)', border: '1px solid var(--success)', color: 'var(--success)' }}>
                             Password changed successfully!
                         </div>
                     )}

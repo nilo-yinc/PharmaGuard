@@ -13,7 +13,7 @@ const ThemeContext = createContext<ThemeContextType>({
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isDark, setIsDark] = useState(() => {
         const saved = localStorage.getItem('pg_theme');
-        return saved ? saved === 'dark' : false; // default to light
+        return saved ? saved === 'dark' : true; // default to dark
     });
 
     useEffect(() => {

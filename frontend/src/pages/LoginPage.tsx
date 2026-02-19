@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12" style={{ background: 'var(--bg-muted)' }}>
+        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -69,7 +69,7 @@ const LoginPage: React.FC = () => {
                                 initial={{ opacity: 0, y: -8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="px-4 py-3 rounded-xl text-sm"
-                                style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626' }}
+                                style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', color: 'var(--danger)' }}
                             >
                                 {error}
                             </motion.div>
@@ -81,7 +81,7 @@ const LoginPage: React.FC = () => {
                                 initial={{ opacity: 0, y: -8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="px-4 py-3 rounded-xl text-sm"
-                                style={{ background: '#FFFBEB', border: '1px solid #FDE68A', color: '#D97706' }}
+                                style={{ background: 'var(--warning-light)', border: '1px solid var(--warning)', color: 'var(--warning)' }}
                             >
                                 Password reset is not available in demo mode. Please create a new account.
                             </motion.div>

@@ -81,26 +81,28 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                         className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-2xl flex flex-col"
                         style={{
-                            background: '#FAFBFC',
-                            borderLeft: '1px solid #E5E7EB',
-                            boxShadow: '-8px 0 30px rgba(0,0,0,0.08)',
+                            background: 'var(--bg-surface)',
+                            backdropFilter: 'var(--backdrop)',
+                            WebkitBackdropFilter: 'var(--backdrop)',
+                            borderLeft: '1px solid var(--border)',
+                            boxShadow: '-8px 0 30px rgba(0,0,0,0.3)',
                         }}
                     >
                         {/* Panel header */}
                         <div
                             className="flex items-center justify-between px-5 py-4 flex-shrink-0"
-                            style={{ background: 'white', borderBottom: '1px solid #F3F4F6' }}
+                            style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)' }}
                         >
                             <div className="flex items-center gap-3">
                                 <div
                                     className="w-8 h-8 rounded-lg flex items-center justify-center"
-                                    style={{ background: '#E6F5F5', border: '1px solid #CCE9EA' }}
+                                    style={{ background: 'var(--primary-light)', border: '1px solid var(--primary)' }}
                                 >
-                                    <Code2 size={16} style={{ color: '#0D7377' }} />
+                                    <Code2 size={16} style={{ color: 'var(--primary)' }} />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-sm" style={{ color: '#1F2937' }}>{title}</h3>
-                                    <p className="text-xs" style={{ color: '#9CA3AF' }}>{lineCount} lines • application/json</p>
+                                    <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{lineCount} lines • application/json</p>
                                 </div>
                             </div>
 
@@ -108,7 +110,7 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                                 {/* Schema validation badge */}
                                 <div
                                     className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                                    style={{ background: '#ECFDF5', border: '1px solid #D1FAE5', color: '#059669' }}
+                                    style={{ background: 'var(--success-light)', border: '1px solid var(--success)', color: 'var(--success)' }}
                                 >
                                     <CheckCircle size={10} />
                                     Valid Schema
@@ -121,9 +123,9 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                                     onClick={handleCopy}
                                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
                                     style={{
-                                        background: copied ? '#ECFDF5' : '#E6F5F5',
-                                        border: copied ? '1px solid #D1FAE5' : '1px solid #CCE9EA',
-                                        color: copied ? '#059669' : '#0D7377',
+                                        background: copied ? 'var(--success-light)' : 'var(--primary-light)',
+                                        border: copied ? '1px solid var(--success)' : '1px solid var(--primary)',
+                                        color: copied ? 'var(--success)' : 'var(--primary)',
                                     }}
                                 >
                                     {copied ? <CheckCircle size={12} /> : <Copy size={12} />}
@@ -136,7 +138,7 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleDownload}
                                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
-                                    style={{ background: '#FEF3C7', border: '1px solid #FDE68A', color: '#D97706' }}
+                                    style={{ background: 'var(--warning-light)', border: '1px solid var(--warning)', color: 'var(--warning)' }}
                                 >
                                     <Download size={12} />
                                     Download
@@ -148,7 +150,7 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                                     whileTap={{ scale: 0.9 }}
                                     onClick={onClose}
                                     className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-                                    style={{ color: '#9CA3AF', background: '#F9FAFB', border: '1px solid #E5E7EB' }}
+                                    style={{ color: 'var(--text-muted)', background: 'var(--bg-muted)', border: '1px solid var(--border)' }}
                                 >
                                     <X size={16} />
                                 </motion.button>
@@ -158,20 +160,20 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                         {/* Compliance badges */}
                         <div
                             className="flex gap-2 px-5 py-2.5 flex-shrink-0"
-                            style={{ background: 'white', borderBottom: '1px solid #F3F4F6' }}
+                            style={{ background: 'var(--bg-muted)', borderBottom: '1px solid var(--border)' }}
                         >
                             {[
-                                { label: 'CPIC Guideline Aligned', color: '#059669' },
+                                { label: 'CPIC Guideline Aligned', color: 'var(--success)' },
                                 { label: 'Explainable AI', color: '#7C3AED' },
-                                { label: 'VCF v4.2 Compatible', color: '#0D7377' },
-                                { label: 'HIPAA Safe', color: '#D97706' },
+                                { label: 'VCF v4.2 Compatible', color: 'var(--primary)' },
+                                { label: 'HIPAA Safe', color: 'var(--warning)' },
                             ].map(badge => (
                                 <span
                                     key={badge.label}
                                     className="px-2 py-0.5 rounded text-[10px] font-medium"
                                     style={{
-                                        background: `${badge.color}08`,
-                                        border: `1px solid ${badge.color}18`,
+                                        background: 'var(--bg-surface)',
+                                        border: `1px solid var(--border)`,
                                         color: badge.color,
                                     }}
                                 >
@@ -181,14 +183,14 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                         </div>
 
                         {/* JSON Editor area */}
-                        <div className="flex-1 overflow-hidden flex" style={{ background: 'white' }}>
+                        <div className="flex-1 overflow-hidden flex" style={{ background: 'var(--bg-surface)' }}>
                             {/* Line numbers */}
                             <div
                                 className="flex-shrink-0 w-10 pt-4 pb-4 select-none"
-                                style={{ background: '#F9FAFB', borderRight: '1px solid #F3F4F6' }}
+                                style={{ background: 'var(--bg-muted)', borderRight: '1px solid var(--border)' }}
                             >
                                 {jsonString.split('\n').map((_, i) => (
-                                    <div key={i} className="text-right pr-2 text-[10px] leading-5 font-mono" style={{ color: '#D1D5DB' }}>
+                                    <div key={i} className="text-right pr-2 text-[10px] leading-5 font-mono" style={{ color: 'var(--text-muted)' }}>
                                         {i + 1}
                                     </div>
                                 ))}
@@ -197,7 +199,7 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                             {/* Code area */}
                             <pre
                                 className="flex-1 overflow-auto p-4 text-xs font-mono leading-5"
-                                style={{ background: 'white', color: '#1F2937' }}
+                                style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}
                                 dangerouslySetInnerHTML={{ __html: highlightJSON(jsonString) }}
                             />
                         </div>
@@ -205,12 +207,12 @@ const JSONPanel: React.FC<JSONPanelProps> = ({ isOpen, onClose, data, title = 'S
                         {/* Footer */}
                         <div
                             className="px-5 py-3 flex-shrink-0 flex items-center justify-between"
-                            style={{ background: 'white', borderTop: '1px solid #F3F4F6' }}
+                            style={{ background: 'var(--bg-muted)', borderTop: '1px solid var(--border)' }}
                         >
-                            <span className="text-xs font-mono" style={{ color: '#9CA3AF' }}>
+                            <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
                                 PharmaGuard API Schema v2.4
                             </span>
-                            <span className="text-xs" style={{ color: '#9CA3AF' }}>
+                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
                                 {new Blob([jsonString]).size} bytes
                             </span>
                         </div>

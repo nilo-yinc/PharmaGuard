@@ -18,7 +18,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
         <section
             id="hero"
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
-            style={{ background: 'linear-gradient(180deg, var(--bg-main) 0%, var(--bg-muted) 100%)' }}
         >
             {/* Subtle decorative circles */}
             <div
@@ -39,9 +38,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     transition={{ duration: 0.6 }}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8"
                     style={{
-                        background: '#ECFDF5',
-                        border: '1px solid #D1FAE5',
-                        color: '#059669',
+                        background: 'var(--success-light)',
+                        border: '1px solid var(--success)',
+                        color: 'var(--success)',
                     }}
                 >
                     <div className="w-2 h-2 rounded-full" style={{ background: '#059669' }} />
@@ -83,9 +82,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                                     : ''
                                     }`}
                                 style={{
-                                    color: item === '→' ? '#D1D5DB' : '#0D7377',
-                                    background: item === '→' ? 'transparent' : '#E6F5F5',
-                                    border: item === '→' ? 'none' : '1px solid #CCE9EA',
+                                    color: item === '→' ? 'var(--text-muted)' : 'var(--primary)',
+                                    background: item === '→' ? 'transparent' : 'var(--primary-light)',
+                                    border: item === '→' ? 'none' : '1px solid var(--primary)',
                                 }}
                             >
                                 {item}
@@ -165,7 +164,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-                style={{ color: '#D1D5DB' }}
+                style={{ color: 'var(--text-muted)' }}
             >
                 <ChevronDown size={24} />
             </motion.div>

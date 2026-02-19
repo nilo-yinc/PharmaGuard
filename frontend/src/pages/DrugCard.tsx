@@ -79,7 +79,7 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                     {/* Confidence score ring */}
                     <div className="relative w-14 h-14 flex-shrink-0">
                         <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
-                            <circle cx="28" cy="28" r="22" fill="none" stroke="#F3F4F6" strokeWidth="4" />
+                            <circle cx="28" cy="28" r="22" fill="none" stroke="var(--border)" strokeWidth="4" className="text-gray-200 dark:text-gray-700" />
                             <motion.circle
                                 cx="28" cy="28" r="22" fill="none"
                                 stroke={riskColor}
@@ -103,7 +103,7 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                         <span style={{ color: '#9CA3AF' }}>AI Confidence</span>
                         <span style={{ color: riskColor }}>{drug.confidence}%</span>
                     </div>
-                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}>
                         <motion.div
                             className="h-full rounded-full"
                             initial={{ width: 0 }}
@@ -121,9 +121,9 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                             key={v.gene}
                             className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono"
                             style={{
-                                background: '#E6F5F5',
-                                border: '1px solid #CCE9EA',
-                                color: '#0D7377',
+                                background: 'var(--primary-light)',
+                                border: '1px solid var(--primary)',
+                                color: 'var(--primary)',
                             }}
                         >
                             <Dna size={10} />

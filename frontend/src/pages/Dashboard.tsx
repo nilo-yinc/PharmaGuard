@@ -97,9 +97,9 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedDrugs }) => {
                         onClick={() => setPrivacyMode(v => !v)}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium"
                         style={{
-                            background: privacyMode ? '#FFFBEB' : 'var(--bg-muted)',
-                            border: `1px solid ${privacyMode ? '#FDE68A' : 'var(--border)'}`,
-                            color: privacyMode ? '#D97706' : 'var(--text-muted)',
+                            background: privacyMode ? 'var(--warning-light)' : 'var(--bg-muted)',
+                            border: `1px solid ${privacyMode ? 'var(--warning)' : 'var(--border)'}`,
+                            color: privacyMode ? 'var(--warning)' : 'var(--text-muted)',
                         }}
                     >
                         {privacyMode ? <Lock size={12} /> : <Eye size={12} />}
@@ -144,7 +144,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedDrugs }) => {
                     >
                         {privacyMode && (
                             <div className="mb-4 px-3 py-2 rounded-xl text-[10px] flex items-center gap-2"
-                                style={{ background: '#FFFBEB', border: '1px solid #FDE68A', color: '#D97706' }}>
+                                style={{ background: 'var(--warning-light)', border: '1px solid var(--warning)', color: 'var(--warning)' }}>
                                 <Lock size={10} />
                                 Privacy mode: Variant rsIDs are masked in JSON view
                             </div>

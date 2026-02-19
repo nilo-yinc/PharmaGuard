@@ -46,9 +46,9 @@ export const FloatingBadges: React.FC = () => {
                 onClick={() => setExpanded(v => !v)}
                 className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-black"
                 style={{
-                    background: '#ECFDF5',
-                    border: '1.5px solid #D1FAE5',
-                    color: '#059669',
+                    background: 'var(--success-light)',
+                    border: '1.5px solid var(--success)',
+                    color: 'var(--success)',
                 }}
                 title="Compliance Badges"
             >
@@ -99,7 +99,7 @@ export const GenomicTimeline: React.FC = () => {
                     {hasHighRisk && (
                         <div
                             className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-                            style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626' }}
+                            style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', color: 'var(--danger)' }}
                         >
                             ⚠ High Risk Detected
                         </div>
@@ -306,13 +306,13 @@ export const DataPrivacyBanner: React.FC<{ enabled: boolean }> = ({ enabled }) =
             >
                 <div
                     className="px-5 py-2.5 flex items-center gap-3"
-                    style={{ background: '#FFFBEB', borderBottom: '1px solid #FDE68A' }}
+                    style={{ background: 'var(--warning-light)', borderBottom: '1px solid var(--warning)' }}
                 >
-                    <Lock size={13} style={{ color: '#D97706' }} className="flex-shrink-0" />
-                    <p className="text-[10px] flex-1" style={{ color: '#D97706' }}>
+                    <Lock size={13} style={{ color: 'var(--warning)' }} className="flex-shrink-0" />
+                    <p className="text-[10px] flex-1" style={{ color: 'var(--warning)' }}>
                         <strong>Genomic Data Privacy Mode Active</strong> — Variant IDs masked · Session data auto-deleted on close · No server storage
                     </p>
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#D97706' }} />
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--warning)' }} />
                 </div>
             </motion.div>
         )}

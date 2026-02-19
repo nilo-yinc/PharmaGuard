@@ -5,7 +5,6 @@ import VCFUpload from './VCFUpload';
 import DrugInput from './DrugInput';
 import { useNavigate } from 'react-router-dom';
 import { SupportedDrug } from '../utils/mockData';
-
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -25,12 +24,12 @@ const LandingPage: React.FC = () => {
             />
 
             {/* VCF Upload section */}
-            <div className="relative" style={{ background: 'var(--bg-muted)' }}>
+            <div className="relative" style={{ background: 'var(--bg-muted)', backdropFilter: 'var(--backdrop)', WebkitBackdropFilter: 'var(--backdrop)' }}>
                 <VCFUpload onFileAccepted={(file) => setUploadedFile(file)} />
             </div>
 
             {/* Drug Input section */}
-            <div className="relative" style={{ background: 'var(--bg-surface)' }}>
+            <div className="relative" style={{ background: 'var(--bg-surface)', backdropFilter: 'var(--backdrop)', WebkitBackdropFilter: 'var(--backdrop)' }}>
                 <DrugInput
                     onDrugsSelected={setSelectedDrugs}
                     onAnalyze={handleAnalyze}
@@ -88,15 +87,15 @@ const LandingPage: React.FC = () => {
                     <h3 className="text-lg font-bold mb-4 text-center" style={{ color: 'var(--text-primary)' }}>Error Handling</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { type: 'Invalid VCF Format', desc: 'File doesn\'t conform to VCF 4.1/4.2 standard.', solution: 'System validates ##fileformat header and CHROM structure.', color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
-                            { type: 'Missing Gene Annotations', desc: 'VCF lacks pharmacogene annotations.', solution: 'Provides partial analysis with confidence degradation.', color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
-                            { type: 'Unsupported Drug', desc: 'Drug not in CPIC database.', solution: 'Returns "Unknown" label with PharmGKB link.', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-                            { type: 'Network/API Error', desc: 'Analysis service unavailable.', solution: 'Fallback to cached CPIC guidelines with offline indicator.', color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB' },
+                            { type: 'Invalid VCF Format', desc: 'File doesn\'t conform to VCF 4.1/4.2 standard.', solution: 'System validates ##fileformat header and CHROM structure.', bgVar: 'var(--danger-light)', borderVar: 'var(--danger)', colorVar: 'var(--danger)' },
+                            { type: 'Missing Gene Annotations', desc: 'VCF lacks pharmacogene annotations.', solution: 'Provides partial analysis with confidence degradation.', bgVar: 'var(--warning-light)', borderVar: 'var(--warning)', colorVar: 'var(--warning)' },
+                            { type: 'Unsupported Drug', desc: 'Drug not in CPIC database.', solution: 'Returns "Unknown" label with PharmGKB link.', bgVar: 'var(--info-light)', borderVar: 'var(--info)', colorVar: 'var(--info)' },
+                            { type: 'Network/API Error', desc: 'Analysis service unavailable.', solution: 'Fallback to cached CPIC guidelines with offline indicator.', bgVar: 'var(--bg-muted)', borderVar: 'var(--border)', colorVar: 'var(--text-secondary)' },
                         ].map((err) => (
-                            <div key={err.type} className="p-4 rounded-xl text-xs" style={{ background: err.bg, border: `1px solid ${err.border}` }}>
-                                <p className="font-semibold mb-1" style={{ color: err.color }}>{err.type}</p>
-                                <p className="mb-2 leading-relaxed" style={{ color: '#6B7280' }}>{err.desc}</p>
-                                <p className="leading-relaxed" style={{ color: '#4B5563' }}>{err.solution}</p>
+                            <div key={err.type} className="p-4 rounded-xl text-xs" style={{ background: err.bgVar, border: `1px solid ${err.borderVar}` }}>
+                                <p className="font-semibold mb-1" style={{ color: err.colorVar }}>{err.type}</p>
+                                <p className="mb-2 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{err.desc}</p>
+                                <p className="leading-relaxed" style={{ color: 'var(--text-primary)' }}>{err.solution}</p>
                             </div>
                         ))}
                     </div>

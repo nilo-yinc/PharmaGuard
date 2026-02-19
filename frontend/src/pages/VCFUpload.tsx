@@ -83,10 +83,10 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
     };
 
     const getBorderColor = () => {
-        if (isDragReject || fileError) return '#FECACA';
-        if (isDragActive) return '#0D7377';
-        if (isSuccess) return '#D1FAE5';
-        return '#D1D5DB';
+        if (isDragReject || fileError) return 'var(--danger)';
+        if (isDragActive) return 'var(--primary)';
+        if (isSuccess) return 'var(--success)';
+        return 'var(--border-hover)';
     };
 
     const getBgColor = () => {
@@ -107,7 +107,7 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                 className="text-center mb-12"
             >
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-4"
-                    style={{ background: '#E6F5F5', border: '1px solid #CCE9EA', color: '#0D7377' }}
+                    style={{ background: 'var(--primary-light)', border: '1px solid var(--primary)', color: 'var(--primary)' }}
                 >
                     <Upload size={12} />
                     Step 1 of 2
@@ -153,7 +153,7 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                                 variants called against a reference genome (e.g., GRCh38).
                             </p>
                             <div className="mt-2 font-mono text-xs rounded p-2"
-                                style={{ background: '#F3F4F6', color: '#059669' }}
+                                style={{ background: 'var(--bg-muted)', color: 'var(--success)', border: '1px solid var(--border)' }}
                             >
                                 ##fileformat=VCFv4.2<br />
                                 #CHROM  POS  ID  REF  ALT  ...
@@ -191,13 +191,13 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                             >
                                 <div
                                     className="mx-auto w-16 h-16 rounded-full flex items-center justify-center"
-                                    style={{ background: '#ECFDF5' }}
+                                    style={{ background: 'var(--success-light)', border: '1px solid var(--success)' }}
                                 >
-                                    <CheckCircle size={32} style={{ color: '#059669' }} />
+                                    <CheckCircle size={32} style={{ color: 'var(--success)' }} />
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-lg" style={{ color: '#059669' }}>VCF File Loaded Successfully</p>
-                                    <p className="text-sm mt-1" style={{ color: '#9CA3AF' }}>Variant data parsed and ready for analysis</p>
+                                    <p className="font-semibold text-lg" style={{ color: 'var(--success)' }}>VCF File Loaded Successfully</p>
+                                    <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Variant data parsed and ready for analysis</p>
                                 </div>
                             </motion.div>
                         ) : isUploading ? (
@@ -206,11 +206,11 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                                     className="mx-auto w-16 h-16 rounded-full flex items-center justify-center"
-                                    style={{ border: '2px solid #E5E7EB', borderTopColor: '#0D7377' }}
+                                    style={{ border: '2px solid var(--border)', borderTopColor: 'var(--primary)' }}
                                 >
                                     <Dna size={24} style={{ color: '#0D7377' }} />
                                 </motion.div>
-                                <p className="font-medium" style={{ color: '#0D7377' }}>Parsing VCF File...</p>
+                                <p className="font-medium" style={{ color: 'var(--primary)' }}>Parsing VCF File...</p>
                             </motion.div>
                         ) : (
                             <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
@@ -219,8 +219,8 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                                     transition={{ duration: 0.2 }}
                                     className="mx-auto w-20 h-20 rounded-2xl flex items-center justify-center"
                                     style={{
-                                        background: '#E6F5F5',
-                                        border: '1px solid #CCE9EA',
+                                        background: 'var(--primary-light)',
+                                        border: '1px solid var(--primary)',
                                     }}
                                 >
                                     <Upload size={32} style={{ color: isDragActive ? 'var(--primary)' : 'var(--text-muted)' }} />
@@ -261,7 +261,7 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                                 <span>Parsing variants...</span>
                                 <span>{uploadProgress}%</span>
                             </div>
-                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}>
                                 <motion.div
                                     className="h-full rounded-full"
                                     style={{
@@ -283,12 +283,12 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                             className="mt-4 p-4 rounded-xl flex items-start gap-3"
-                            style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}
+                            style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)' }}
                         >
-                            <XCircle size={20} className="flex-shrink-0 mt-0.5" style={{ color: '#DC2626' }} />
+                            <XCircle size={20} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--danger)' }} />
                             <div>
-                                <p className="font-semibold text-sm" style={{ color: '#DC2626' }}>Upload Failed</p>
-                                <p className="text-xs mt-0.5" style={{ color: '#DC2626', opacity: 0.7 }}>{fileError}</p>
+                                <p className="font-semibold text-sm" style={{ color: 'var(--danger)' }}>Upload Failed</p>
+                                <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{fileError}</p>
                             </div>
                         </motion.div>
                     )}

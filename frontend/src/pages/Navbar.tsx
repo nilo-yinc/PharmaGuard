@@ -43,16 +43,23 @@ const Navbar: React.FC = () => {
     };
 
     const navLinkStyle = (isActive: boolean) => ({
-        color: isActive ? '#0D7377' : '#6B7280',
+        color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
         fontWeight: isActive ? 600 : 500,
     });
 
     return (
         <nav
-            className="sticky top-0 z-50 backdrop-blur-md"
+            className="sticky top-0 z-50"
             style={{
-                background: 'var(--bg-surface)',
+                background: isDark
+                    ? 'rgba(0, 4, 8, 0.82)'
+                    : 'rgba(240, 248, 255, 0.82)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
                 borderBottom: '1px solid var(--border)',
+                boxShadow: isDark
+                    ? '0 1px 24px rgba(0,0,0,0.5)'
+                    : '0 1px 24px rgba(13,115,119,0.08)',
             }}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,7 +101,7 @@ const Navbar: React.FC = () => {
                     <div className="flex items-center gap-2">
                         {/* CPIC Badge */}
                         <div className="hidden lg:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium"
-                            style={{ background: '#ECFDF5', border: '1px solid #D1FAE5', color: '#059669' }}>
+                            style={{ background: 'var(--success-light)', border: '1px solid var(--success)', color: 'var(--success)' }}>
                             <Shield size={10} />
                             CPIC Aligned
                         </div>

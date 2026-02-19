@@ -209,7 +209,7 @@ const RiskVisualizations: React.FC<RiskVisualizationsProps> = ({ result }) => {
                     </h3>
                     <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
                         <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded" style={{ background: '#F3F4F6' }} />
+                            <span className="w-2 h-2 rounded" style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }} />
                             Low
                         </span>
                         <span className="flex items-center gap-1">

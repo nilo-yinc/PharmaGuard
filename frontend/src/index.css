@@ -5,66 +5,60 @@
 /* Custom CSS Variables — Clean Medical Palette */
 :root {
   --primary: #0D7377;
-  --primary-light: #E6F5F5;
+  --primary-light: rgba(13, 115, 119, 0.12);
   --primary-hover: #0A5C5F;
   --accent: #E8645A;
-  --accent-light: #FEF0EF;
+  --accent-light: rgba(232, 100, 90, 0.12);
   --accent-hover: #D4524A;
-  --bg-main: #FAFBFC;
-  --bg-surface: #FFFFFF;
-  --bg-muted: #F3F4F6;
+  --bg-main: #F0F7FF;
+  --bg-surface: rgba(255, 255, 255, 0.82);
+  --bg-muted: rgba(240, 247, 255, 0.72);
   --text-primary: #1F2937;
   --text-secondary: #6B7280;
   --text-muted: #9CA3AF;
-  --border: #E5E7EB;
-  --border-hover: #D1D5DB;
+  --border: rgba(209, 213, 219, 0.7);
+  --border-hover: #9CA3AF;
   --success: #059669;
-  --success-light: #ECFDF5;
+  --success-light: rgba(5, 150, 105, 0.12);
   --warning: #D97706;
-  --warning-light: #FFFBEB;
+  --warning-light: rgba(217, 119, 6, 0.12);
   --danger: #DC2626;
-  --danger-light: #FEF2F2;
+  --danger-light: rgba(220, 38, 38, 0.12);
   --info: #2563EB;
-  --info-light: #EFF6FF;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --info-light: rgba(37, 99, 235, 0.12);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
+  --backdrop: blur(16px);
 }
 
 .dark {
   --primary: #14B8A6;
-  --primary-light: #0D2B2E;
+  --primary-light: rgba(20, 184, 166, 0.15);
   --primary-hover: #0D7377;
   --accent: #F87171;
-  --accent-light: #3B0F0D;
+  --accent-light: rgba(248, 113, 113, 0.15);
   --accent-hover: #FCA5A5;
   --bg-main: #000000;
-  --bg-surface: #0d0d0d;
-  --bg-muted: #1a1a1a;
+  --bg-surface: rgba(10, 15, 22, 0.80);
+  --bg-muted: rgba(18, 24, 34, 0.75);
   --text-primary: #F3F4F6;
   --text-secondary: #9CA3AF;
   --text-muted: #6B7280;
-  --border: #2a2a2a;
-  --border-hover: #3a3a3a;
+  --border: rgba(55, 65, 81, 0.80);
+  --border-hover: #6B7280;
   --success: #10B981;
-  --success-light: #064E3B;
+  --success-light: rgba(16, 185, 129, 0.15);
   --warning: #F59E0B;
-  --warning-light: #78350F;
+  --warning-light: rgba(245, 158, 11, 0.15);
   --danger: #EF4444;
-  --danger-light: #7F1D1D;
+  --danger-light: rgba(239, 68, 68, 0.15);
   --info: #3B82F6;
-  --info-light: #1E3A8A;
-  --success: #10B981;
-  --success-light: #052e1c;
-  --warning: #F59E0B;
-  --warning-light: #2d1a00;
-  --danger: #EF4444;
-  --danger-light: #2d0000;
-  --info: #3B82F6;
-  --info-light: #0f1e3d;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.6);
+  --info-light: rgba(59, 130, 246, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.8), 0 4px 8px rgba(0, 0, 0, 0.6);
+  --backdrop: blur(20px);
 }
 
 /* Base styles */
@@ -112,6 +106,8 @@ body.light {
     border: 1px solid var(--border);
     border-radius: 1rem;
     box-shadow: var(--shadow-sm);
+    backdrop-filter: var(--backdrop);
+    -webkit-backdrop-filter: var(--backdrop);
   }
 
   .glass-card-light {
@@ -119,6 +115,8 @@ body.light {
     border: 1px solid var(--border);
     border-radius: 1rem;
     box-shadow: var(--shadow-sm);
+    backdrop-filter: var(--backdrop);
+    -webkit-backdrop-filter: var(--backdrop);
   }
 
   .gradient-text {
@@ -291,3 +289,32 @@ body.light {
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* ── DNA Background Glass Effect ────────────────────────────────────────────── */
+/* All rounded surface cards get frosted-glass blur against the DNA background  */
+
+/* Target common card patterns used throughout the app */
+[style*="var(--bg-surface)"],
+[style*="var(--bg-muted)"] {
+  backdrop-filter: var(--backdrop);
+  -webkit-backdrop-filter: var(--backdrop);
+}
+
+/* Navbar gets glass treatment */
+nav {
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* DNA background shimmer pulse for dark mode */
+@keyframes dna-pulse {
+  0%, 100% { opacity: 0.30; }
+  50%       { opacity: 0.38; }
+}
+@keyframes dna-pulse-light {
+  0%, 100% { opacity: 0.46; }
+  50%       { opacity: 0.58; }
+}
+
+html.dark  .dna-bg-img { animation: dna-pulse       6s ease-in-out infinite; }
+html:not(.dark) .dna-bg-img { animation: dna-pulse-light 8s ease-in-out infinite; }

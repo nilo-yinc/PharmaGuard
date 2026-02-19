@@ -4,15 +4,29 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const connectDB = require('./config/database');
+
+// Load environment variables
 dotenv.config();
+
 // Import routes
 const uploadRoutes = require('./routes/upload.routes');
 
-connectDB();
-// Load environment variables
-
-
 const app = express();
+
+// Database connection middleware - ensures connection before each request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    res.status(503).json({
+      success: false,
+      error: 'Database connection failed',
+      message: 'Unable to connect to database. Please try again later.'
+    });
+  }
+});
 
 // Middleware
 app.use(helmet());

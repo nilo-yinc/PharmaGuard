@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Dna, Shield, Zap, Brain } from 'lucide-react';
+import { BackgroundGrid, GeneHelixArt, MedicalCrossPattern } from '../components/HealthcareVisuals';
 
 interface HeroSectionProps {
     onAnalyze: () => void;
@@ -18,20 +19,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
         <section
             id="hero"
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
-            style={{ background: 'linear-gradient(180deg, var(--bg-main) 0%, var(--bg-muted) 100%)' }}
+            style={{ background: 'linear-gradient(180deg, rgba(13,115,119,0.06) 0%, var(--bg-main) 35%, var(--bg-muted) 100%)' }}
         >
-            {/* Subtle decorative circles */}
+            {/* Background visuals (subtle, healthcare-themed) */}
+            <BackgroundGrid className="absolute inset-0" />
+            <MedicalCrossPattern className="absolute inset-0" />
             <div
-                className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-20"
+                className="absolute top-24 right-24 w-[28rem] h-[28rem] rounded-full opacity-25 blur-2xl"
                 style={{ background: 'radial-gradient(circle, var(--primary-light), transparent 70%)' }}
             />
             <div
-                className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-10"
+                className="absolute bottom-10 left-10 w-[22rem] h-[22rem] rounded-full opacity-15 blur-2xl"
                 style={{ background: 'radial-gradient(circle, var(--accent-light), transparent 70%)' }}
             />
 
+            {/* Gene helix art (right side) */}
+            <div className="absolute -right-24 top-1/2 -translate-y-1/2 opacity-70 pointer-events-none animate-float">
+                <GeneHelixArt className="w-[360px] h-[700px]" />
+            </div>
+
             {/* Main content */}
-            <div className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="relative z-10 text-center max-w-6xl mx-auto px-4 sm:px-6">
                 {/* Status badge */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
@@ -39,12 +47,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     transition={{ duration: 0.6 }}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8"
                     style={{
-                        background: '#ECFDF5',
+                        background: 'var(--success-light)',
                         border: '1px solid #D1FAE5',
-                        color: '#059669',
+                        color: 'var(--success)',
                     }}
                 >
-                    <div className="w-2 h-2 rounded-full" style={{ background: '#059669' }} />
+                    <div className="w-2 h-2 rounded-full" style={{ background: 'var(--success)' }} />
                     Genomic Analysis Engine Active
                 </motion.div>
 
@@ -105,11 +113,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={onAnalyze}
-                        className="relative px-8 py-4 rounded-xl font-semibold text-white text-base overflow-hidden group transition-all duration-200"
-                        style={{
-                            background: '#E8645A',
-                            boxShadow: '0 4px 14px rgba(232,100,90,0.25)',
-                        }}
+                        className="btn-primary text-base shadow-[0_10px_30px_rgba(232,100,90,0.22)]"
                     >
                         <span className="relative z-10 flex items-center gap-2">
                             <Dna size={20} />
@@ -120,12 +124,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     <motion.a
                         href="#about"
                         whileHover={{ scale: 1.03 }}
-                        className="px-6 py-4 rounded-xl font-medium text-sm transition-all duration-200"
-                        style={{
-                            border: '1px solid var(--border)',
-                            color: 'var(--text-secondary)',
-                            background: 'var(--bg-surface)',
-                        }}
+                        className="btn-secondary px-6 py-4 text-sm"
                     >
                         Learn About CPIC Guidelines →
                     </motion.a>

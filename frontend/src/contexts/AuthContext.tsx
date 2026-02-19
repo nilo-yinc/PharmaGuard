@@ -1,23 +1,22 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import {
-    User,
-    getSession,
-    clearSession,
-    loginUser as loginService,
-    registerUser as registerService,
-    updateUser as updateService,
-} from '../services/storageService';
-
-type SafeUser = Omit<User, 'passwordHash'>;
+    ApiUser,
+    apiLogin,
+    apiRegister,
+    apiLogout,
+    apiGetProfile,
+    apiUpdateProfile,
+} from '../services/authApi';
 
 interface AuthContextType {
-    user: SafeUser | null;
+    user: ApiUser | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
     register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-    logout: () => void;
-    updateProfile: (updates: Partial<Pick<User, 'name' | 'email'>>) => void;
+    logout: () => Promise<void>;
+    updateProfile: (updates: { name?: string; phone?: string }) => Promise<{ success: boolean; error?: string }>;
+    setUserFromOAuth: (user: ApiUser) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,72 +25,68 @@ const AuthContext = createContext<AuthContextType>({
     isLoading: true,
     login: async () => ({ success: false }),
     register: async () => ({ success: false }),
-    logout: () => { },
-    updateProfile: () => { },
+    logout: async () => { },
+    updateProfile: async () => ({ success: false }),
+    setUserFromOAuth: () => { },
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<SafeUser | null>(null);
+    const [user, setUser] = useState<ApiUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // RESTORE SESSION OR DEV BYPASS
+    // On mount: check if JWT cookie is still valid by fetching profile
     useEffect(() => {
-        const session = getSession();
-        if (session) {
-            setUser(session);
-        } else {
-            // DEV: Bypass auth if no session exists
-            const AUTH_BYPASS = true;
-            if (AUTH_BYPASS) {
-                setUser({
-                    id: 'dev-user-123',
-                    name: 'Dev User',
-                    email: 'dev@pharmaguard.ai',
-                    createdAt: new Date().toISOString(),
-                    lastLogin: new Date().toISOString()
-                });
+        apiGetProfile().then((result) => {
+            if (result.ok && result.data?.user) {
+                setUser(result.data.user);
             }
-        }
-        setIsLoading(false);
+            setIsLoading(false);
+        });
     }, []);
 
     const login = useCallback(async (email: string, password: string) => {
-        // Simulate network latency
-        await new Promise(r => setTimeout(r, 600));
-        const result = loginService(email, password);
-        if (result.success && result.user) {
-            const { passwordHash, ...safe } = result.user;
-            setUser(safe);
+        const result = await apiLogin(email, password);
+        if (result.ok && result.data?.user) {
+            setUser(result.data.user);
+            return { success: true };
         }
-        return { success: result.success, error: result.error };
+        return { success: false, error: result.error || 'Login failed.' };
     }, []);
 
     const register = useCallback(async (name: string, email: string, password: string) => {
-        await new Promise(r => setTimeout(r, 600));
-        const result = registerService(name, email, password);
-        if (result.success && result.user) {
-            const { passwordHash, ...safe } = result.user;
-            setUser(safe);
+        const result = await apiRegister(name, email, password);
+        if (result.ok) {
+            // Auto-login after register
+            const loginResult = await apiLogin(email, password);
+            if (loginResult.ok && loginResult.data?.user) {
+                setUser(loginResult.data.user);
+                return { success: true };
+            }
         }
-        return { success: result.success, error: result.error };
+        return { success: false, error: result.error || 'Registration failed.' };
     }, []);
 
-    const logout = useCallback(() => {
-        clearSession();
+    const logout = useCallback(async () => {
+        await apiLogout();
         setUser(null);
     }, []);
 
-    const updateProfile = useCallback((updates: Partial<Pick<User, 'name' | 'email'>>) => {
-        if (!user) return;
-        const updated = updateService(user.id, updates);
-        if (updated) {
-            const { passwordHash, ...safe } = updated;
-            setUser(safe);
+    const updateProfile = useCallback(async (updates: { name?: string; phone?: string }) => {
+        const result = await apiUpdateProfile(updates);
+        if (result.ok && result.data?.user) {
+            setUser(result.data.user);
+            return { success: true };
         }
-    }, [user]);
+        return { success: false, error: result.error || 'Update failed.' };
+    }, []);
+
+    // Used by the Google OAuth callback page to set user directly
+    const setUserFromOAuth = useCallback((oauthUser: ApiUser) => {
+        setUser(oauthUser);
+    }, []);
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, logout, updateProfile }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, logout, updateProfile, setUserFromOAuth }}>
             {children}
         </AuthContext.Provider>
     );

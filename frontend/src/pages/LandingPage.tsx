@@ -5,6 +5,7 @@ import VCFUpload from './VCFUpload';
 import DrugInput from './DrugInput';
 import { useNavigate } from 'react-router-dom';
 import { SupportedDrug } from '../utils/mockData';
+import { Dna, FlaskConical, FileText } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
@@ -55,9 +56,9 @@ const LandingPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
-                        { step: '01', title: 'Upload VCF', desc: 'Upload your Variant Call Format file from whole-genome or targeted pharmacogene sequencing.', icon: '🧬', color: '#0D7377' },
-                        { step: '02', title: 'Genotype Analysis', desc: 'Our AI engine calls diplotypes for 450+ pharmacogenes using CPIC star allele nomenclature.', icon: '⚗️', color: '#E8645A' },
-                        { step: '03', title: 'Clinical Report', desc: 'Receive CPIC-aligned drug risk predictions with clinical recommendations for each medication.', icon: '📋', color: '#059669' },
+                        { step: '01', title: 'Upload VCF', desc: 'Upload your Variant Call Format file from whole-genome or targeted pharmacogene sequencing.', icon: <Dna size={28} />, color: '#0D7377', bg: 'rgba(13,115,119,0.08)' },
+                        { step: '02', title: 'Genotype Analysis', desc: 'Our AI engine calls diplotypes for 450+ pharmacogenes using CPIC star allele nomenclature.', icon: <FlaskConical size={28} />, color: '#E8645A', bg: 'rgba(232,100,90,0.08)' },
+                        { step: '03', title: 'Clinical Report', desc: 'Receive CPIC-aligned drug risk predictions with clinical recommendations for each medication.', icon: <FileText size={28} />, color: '#059669', bg: 'rgba(5,150,105,0.08)' },
                     ].map((item, i) => (
                         <motion.div
                             key={item.step}
@@ -69,7 +70,12 @@ const LandingPage: React.FC = () => {
                             className="p-6 rounded-2xl text-center transition-all duration-200"
                             style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
                         >
-                            <div className="text-4xl mb-4">{item.icon}</div>
+                            <div
+                                className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                                style={{ background: item.bg, border: `1px solid ${item.color}25`, color: item.color }}
+                            >
+                                {item.icon}
+                            </div>
                             <div className="text-xs font-mono mb-2 font-bold" style={{ color: item.color }}>STEP {item.step}</div>
                             <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
                             <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>

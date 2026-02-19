@@ -7,7 +7,7 @@ import {
     Save, Check
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { changePassword, deleteAccount, getUserStats, getUserAnalyses } from '../services/storageService';
+import { getUserStats, getUserAnalyses } from '../services/storageService';
 
 const ProfilePage: React.FC = () => {
     const { user, updateProfile, logout } = useAuth();
@@ -29,46 +29,23 @@ const ProfilePage: React.FC = () => {
     const [privacyMode, setPrivacyMode] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-    const handleSaveProfile = () => {
-        updateProfile({ name, email });
-        setProfileSaved(true);
-        setTimeout(() => setProfileSaved(false), 2000);
+    const handleSaveProfile = async () => {
+        const result = await updateProfile({ name });
+        if (result.success) {
+            setProfileSaved(true);
+            setTimeout(() => setProfileSaved(false), 2000);
+        }
     };
 
     const handleChangePassword = () => {
         setPasswordError('');
         setPasswordSuccess(false);
-
-        if (!oldPassword || !newPassword || !confirmNewPassword) {
-            setPasswordError('Please fill in all password fields.');
-            return;
-        }
-        if (newPassword.length < 6) {
-            setPasswordError('New password must be at least 6 characters.');
-            return;
-        }
-        if (newPassword !== confirmNewPassword) {
-            setPasswordError('New passwords do not match.');
-            return;
-        }
-        if (!user) return;
-
-        const result = changePassword(user.id, oldPassword, newPassword);
-        if (result.success) {
-            setPasswordSuccess(true);
-            setOldPassword('');
-            setNewPassword('');
-            setConfirmNewPassword('');
-            setTimeout(() => setPasswordSuccess(false), 3000);
-        } else {
-            setPasswordError(result.error || 'Failed to change password.');
-        }
+        setPasswordError('Password change is not yet available. Please contact support.');
     };
 
-    const handleDeleteAccount = () => {
+    const handleDeleteAccount = async () => {
         if (!user) return;
-        deleteAccount(user.id);
-        logout();
+        await logout();
         navigate('/', { replace: true });
     };
 

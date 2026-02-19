@@ -4,7 +4,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
     Menu, X, Sun, Moon, LogIn, LogOut, User,
     Upload, Pill, LayoutDashboard, Info, FileText,
-    ChevronDown, Settings, History, Shield
+    ChevronDown, Settings, History, Shield, Dna
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -66,7 +66,13 @@ const Navbar: React.FC = () => {
                             PG
                         </div>
                         <div>
-                            <p className="font-bold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
+                            <div className="flex items-center gap-1.5">
+                                <p className="font-bold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
+                                <div className="hidden sm:flex items-center justify-center w-5 h-5 rounded-md"
+                                    style={{ background: 'var(--primary-light)', border: '1px solid var(--border)', color: 'var(--primary)' }}>
+                                    <Dna size={12} />
+                                </div>
+                            </div>
                             <p className="text-[9px] leading-tight" style={{ color: 'var(--text-secondary)' }}>Pharmacogenomics AI</p>
                         </div>
                     </Link>

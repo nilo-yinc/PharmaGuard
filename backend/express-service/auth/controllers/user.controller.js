@@ -371,7 +371,7 @@ const googleCallback = async (req, res) => {
       }
     );
 
-    const { id_token } = tokenResponse.data;
+    const { id_token, refresh_token } = tokenResponse.data;
     if (!id_token) {
       return res.status(401).json({ status: false, message: "No ID token received" });
     }
@@ -396,6 +396,7 @@ const googleCallback = async (req, res) => {
         // Link Google ID to existing user
         user.googleId = decodedToken.sub;
         if (!user.profilePic && decodedToken.picture) user.profilePic = decodedToken.picture;
+        if (refresh_token) user.refreshToken = refresh_token;
         await user.save();
       } else {
         // Create new user
@@ -404,8 +405,13 @@ const googleCallback = async (req, res) => {
           email: decodedToken.email,
           name: decodedToken.name || decodedToken.email.split("@")[0],
           profilePic: decodedToken.picture || "",
+          refreshToken: refresh_token || null,
         });
       }
+    } else if (refresh_token) {
+      // Update refresh token if Google issued a new one
+      user.refreshToken = refresh_token;
+      await user.save();
     }
 
     // Generate JWT (same format as existing login)

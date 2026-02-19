@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
     Menu, X, Sun, Moon, LogIn, LogOut, User,
     Upload, Pill, LayoutDashboard, Info, FileText,
@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext';
 const Navbar: React.FC = () => {
     const { isDark, toggleTheme } = useTheme();
     const { user, isAuthenticated, logout } = useAuth();
+    const location = useLocation();
     const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -29,17 +30,28 @@ const Navbar: React.FC = () => {
     }, []);
 
     const navLinks = [
-        { to: '/analyze', label: 'Upload VCF', icon: <Upload size={14} /> },
-        { to: '/analyze', label: 'Drug Input', icon: <Pill size={14} /> },
-        { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} /> },
-        { to: '/#about', label: 'About', icon: <Info size={14} /> },
-        { to: '#', label: 'Docs', icon: <FileText size={14} /> },
+        { to: '/analyze?step=1', label: 'Upload VCF', icon: <Upload size={14} />, key: 'upload' },
+        { to: '/analyze?step=2', label: 'Drug Input', icon: <Pill size={14} />, key: 'drugs' },
+        { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} />, key: 'dashboard' },
+        { to: '/?section=about', label: 'About', icon: <Info size={14} />, key: 'about' },
+        { to: '/?section=docs', label: 'Docs', icon: <FileText size={14} />, key: 'docs' },
     ];
 
     const handleLogout = () => {
         logout();
         setDropdownOpen(false);
         navigate('/');
+    };
+
+    const currentSection = new URLSearchParams(location.search).get('section') || location.hash.replace('#', '');
+    const currentStep = new URLSearchParams(location.search).get('step');
+
+    const isCustomActive = (linkKey: string, isPathActive: boolean) => {
+        if (linkKey === 'upload') return location.pathname === '/analyze' && (currentStep === null || currentStep === '1');
+        if (linkKey === 'drugs') return location.pathname === '/analyze' && currentStep === '2';
+        if (linkKey === 'about') return location.pathname === '/' && currentSection === 'about';
+        if (linkKey === 'docs') return location.pathname === '/' && currentSection === 'docs';
+        return isPathActive;
     };
 
     const navLinkStyle = (isActive: boolean) => ({
@@ -66,12 +78,14 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center justify-between h-16">
                     {/* Left — Logo */}
                     <Link to="/" className="flex items-center gap-2.5 group">
-                        <div
+                        <motion.div
+                            whileHover={{ rotateX: 10, rotateY: -12, scale: 1.06 }}
+                            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
                             className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm transition-transform group-hover:scale-105"
-                            style={{ background: 'linear-gradient(135deg, #0D7377, #0A5C5F)' }}
+                            style={{ background: 'linear-gradient(135deg, #0D7377, #0A5C5F)', transformStyle: 'preserve-3d' }}
                         >
                             PG
-                        </div>
+                        </motion.div>
                         <div>
                             <p className="font-bold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
                             <p className="text-[9px] leading-tight" style={{ color: 'var(--text-secondary)' }}>Pharmacogenomics AI</p>
@@ -84,11 +98,11 @@ const Navbar: React.FC = () => {
                             <NavLink
                                 key={link.label}
                                 to={link.to}
-                                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 hover:opacity-80"
+                                className="nav-link-3d flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 hover:opacity-95"
                                 style={({ isActive }) => ({
-                                    color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-                                    fontWeight: isActive ? 600 : 500,
-                                    background: isActive ? 'var(--bg-muted)' : 'transparent'
+                                    color: isCustomActive(link.key, isActive) ? 'var(--primary)' : 'var(--text-secondary)',
+                                    fontWeight: isCustomActive(link.key, isActive) ? 600 : 500,
+                                    background: isCustomActive(link.key, isActive) ? 'var(--bg-muted)' : 'transparent'
                                 })}
                             >
                                 {link.icon}
@@ -231,7 +245,7 @@ const Navbar: React.FC = () => {
                                     to={link.to}
                                     onClick={() => setMobileOpen(false)}
                                     className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors"
-                                    style={({ isActive }) => navLinkStyle(isActive)}
+                                    style={({ isActive }) => navLinkStyle(isCustomActive(link.key, isActive))}
                                 >
                                     {link.icon}
                                     {link.label}

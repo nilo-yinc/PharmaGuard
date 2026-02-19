@@ -13,14 +13,14 @@ const uploadRoutes = require('./routes/upload.routes');
 
 const app = express();
 
-// Database connection middleware - ensures connection before each request
+// Database connection middleware - ensures connection before handling requests
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
   } catch (error) {
     console.error('Database connection failed:', error);
-    res.status(503).json({
+    return res.status(503).json({
       success: false,
       error: 'Database connection failed',
       message: 'Unable to connect to database. Please try again later.'

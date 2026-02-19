@@ -55,7 +55,7 @@ const LoadingScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
         <div
             ref={containerRef}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-            style={{ background: '#FAFBFC' }}
+            style={{ background: 'var(--bg-main)' }}
         >
             {/* DNA Helix Animation */}
             <motion.div
@@ -114,10 +114,10 @@ const LoadingScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
                 transition={{ delay: 0.3, duration: 0.6 }}
                 className="text-center"
             >
-                <h1 className="text-4xl font-black mb-2" style={{ color: '#0D7377' }}>
+                <h1 className="text-4xl font-black mb-2" style={{ color: 'var(--primary)' }}>
                     PharmaGuard
                 </h1>
-                <p className="text-sm font-medium tracking-widest uppercase" style={{ color: '#6B7280' }}>
+                <p className="text-sm font-medium tracking-widest uppercase" style={{ color: 'var(--text-secondary)' }}>
                     Pharmacogenomic Risk Prediction
                 </p>
             </motion.div>
@@ -129,16 +129,16 @@ const LoadingScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
                 transition={{ delay: 0.5 }}
                 className="mt-8 w-64"
             >
-                <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--bg-muted)' }}>
                     <motion.div
                         initial={{ width: '0%' }}
                         animate={{ width: '100%' }}
                         transition={{ duration: 2.5, ease: 'easeInOut' }}
                         className="h-full rounded-full"
-                        style={{ background: '#0D7377' }}
+                        style={{ background: 'var(--primary)' }}
                     />
                 </div>
-                <p className="text-xs text-center mt-3 font-medium" style={{ color: '#9CA3AF' }}>
+                <p className="text-xs text-center mt-3 font-medium" style={{ color: 'var(--text-muted)' }}>
                     Initializing Analysis Engine...
                 </p>
             </motion.div>
@@ -155,9 +155,9 @@ const LoadingScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
                         key={badge}
                         className="px-3 py-1 text-xs rounded-full font-medium"
                         style={{
-                            background: '#F3F4F6',
-                            color: '#6B7280',
-                            border: '1px solid #E5E7EB',
+                            background: 'var(--bg-muted)',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border)',
                         }}
                     >
                         {badge}

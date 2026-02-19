@@ -140,14 +140,14 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                             exit={{ opacity: 0 }}
                             className="absolute right-0 top-7 z-20 w-72 p-4 rounded-xl text-sm"
                             style={{
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                                color: '#4B5563',
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                boxShadow: 'var(--shadow-lg)',
+                                color: 'var(--text-secondary)',
                             }}
                         >
-                            <p className="font-semibold mb-2" style={{ color: '#0D7377' }}>VCF (Variant Call Format)</p>
-                            <p className="text-xs leading-relaxed" style={{ color: '#6B7280' }}>
+                            <p className="font-semibold mb-2" style={{ color: 'var(--primary)' }}>VCF (Variant Call Format)</p>
+                            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                                 A standardized text file format used in bioinformatics for storing gene sequence
                                 variations. VCF files contain genomic variants including SNPs, indels, and structural
                                 variants called against a reference genome (e.g., GRCh38).
@@ -223,17 +223,17 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                                         border: '1px solid #CCE9EA',
                                     }}
                                 >
-                                    <Upload size={32} style={{ color: isDragActive ? '#0D7377' : '#0D737780' }} />
+                                    <Upload size={32} style={{ color: isDragActive ? 'var(--primary)' : 'var(--text-muted)' }} />
                                 </motion.div>
                                 <div>
-                                    <p className="text-lg font-semibold" style={{ color: '#1F2937' }}>
+                                    <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                                         {isDragActive ? 'Drop your VCF file here' : 'Drag & drop your VCF file'}
                                     </p>
-                                    <p className="text-sm mt-1" style={{ color: '#9CA3AF' }}>
-                                        or <span style={{ color: '#0D7377', cursor: 'pointer' }}>browse from computer</span>
+                                    <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                                        or <span style={{ color: 'var(--primary)', cursor: 'pointer' }}>browse from computer</span>
                                     </p>
                                 </div>
-                                <div className="flex items-center justify-center gap-4 text-xs" style={{ color: '#9CA3AF' }}>
+                                <div className="flex items-center justify-center gap-4 text-xs" style={{ color: 'var(--text-muted)' }}>
                                     <span className="flex items-center gap-1">
                                         <FileText size={12} />
                                         .vcf files only
@@ -303,15 +303,15 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         className="mt-6 p-6 rounded-2xl"
-                        style={{
-                            background: 'white',
-                            border: '1px solid #E5E7EB',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        }}
-                    >
+                            style={{
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                boxShadow: 'var(--shadow-sm)',
+                            }}
+                        >
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-semibold flex items-center gap-2" style={{ color: '#1F2937' }}>
-                                <FileText size={16} style={{ color: '#0D7377' }} />
+                            <h3 className="font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                                <FileText size={16} style={{ color: 'var(--primary)' }} />
                                 File Summary
                             </h3>
                             <motion.button
@@ -319,13 +319,13 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                                 whileTap={{ scale: 0.9 }}
                                 onClick={clearFile}
                                 className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-                                style={{ color: '#9CA3AF' }}
+                                style={{ color: 'var(--text-muted)' }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.color = '#DC2626';
-                                    e.currentTarget.style.background = '#FEF2F2';
+                                    e.currentTarget.style.background = 'var(--danger-light)';
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = '#9CA3AF';
+                                    e.currentTarget.style.color = 'var(--text-muted)';
                                     e.currentTarget.style.background = 'transparent';
                                 }}
                             >
@@ -338,38 +338,38 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                                 {
                                     label: 'File Name',
                                     value: uploadedFile.name,
-                                    icon: <FileText size={16} style={{ color: '#0D7377' }} />,
+                                    icon: <FileText size={16} style={{ color: 'var(--primary)' }} />,
                                 },
                                 {
                                     label: 'File Size',
                                     value: formatFileSize(uploadedFile.size),
-                                    icon: <AlertCircle size={16} style={{ color: '#E8645A' }} />,
+                                    icon: <AlertCircle size={16} style={{ color: 'var(--accent)' }} />,
                                 },
                                 {
                                     label: 'Detected Variants',
                                     value: `~${mockVariants.toLocaleString()}`,
-                                    icon: <Dna size={16} style={{ color: '#059669' }} />,
+                                    icon: <Dna size={16} style={{ color: 'var(--success)' }} />,
                                 },
                             ].map((item) => (
                                 <div
                                     key={item.label}
                                     className="p-3 rounded-xl"
-                                    style={{ background: '#F9FAFB', border: '1px solid #F3F4F6' }}
+                                    style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}
                                 >
                                     <div className="flex items-center gap-2 mb-1">
                                         {item.icon}
-                                        <span className="text-xs" style={{ color: '#9CA3AF' }}>{item.label}</span>
+                                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{item.label}</span>
                                     </div>
-                                    <p className="font-mono text-sm font-medium truncate" style={{ color: '#1F2937' }}>{item.value}</p>
+                                    <p className="font-mono text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
                                 </div>
                             ))}
                         </div>
 
                         <div className="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg"
-                            style={{ background: '#ECFDF5', border: '1px solid #D1FAE5' }}
+                            style={{ background: 'var(--success-light)', border: '1px solid var(--success)' }}
                         >
-                            <CheckCircle size={14} style={{ color: '#059669' }} />
-                            <span className="text-xs" style={{ color: '#059669' }}>VCF v4.2 format validated — 6 pharmacogenes detected</span>
+                            <CheckCircle size={14} style={{ color: 'var(--success)' }} />
+                            <span className="text-xs" style={{ color: 'var(--success)' }}>VCF v4.2 format validated — 6 pharmacogenes detected</span>
                         </div>
                     </motion.div>
                 )}

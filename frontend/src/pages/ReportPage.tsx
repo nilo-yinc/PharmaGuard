@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getAnalysisById, deleteAnalysis, StoredAnalysis, StoredDrugRisk } from '../services/storageService';
 import { RISK_COLORS } from '../utils/mockData';
+import Dashboard from './Dashboard';
 
 type TabId = 'summary' | 'clinical' | 'variants' | 'heatmap' | 'json';
 
@@ -338,6 +339,11 @@ const ReportPage: React.FC = () => {
                         </span>
                     ))}
                 </motion.div>
+            </div>
+
+            {/* Full Feature Dashboard */}
+            <div className="mt-4" style={{ borderTop: '1px solid var(--border)' }}>
+                <Dashboard selectedDrugs={analysis.drugsAnalyzed} />
             </div>
         </div>
     );

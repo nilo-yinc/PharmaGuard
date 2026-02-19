@@ -87,14 +87,14 @@ export const GenomicTimeline: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="rounded-2xl overflow-hidden relative"
-            style={{ background: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
         >
             <div className="p-6 relative" ref={containerRef}>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h3 className="font-bold text-sm" style={{ color: '#1F2937' }}>Genomic Impact Timeline</h3>
-                        <p className="text-[10px]" style={{ color: '#9CA3AF' }}>Variant detection to clinical consequence</p>
+                        <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Genomic Impact Timeline</h3>
+                        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Variant detection to clinical consequence</p>
                     </div>
                     {hasHighRisk && (
                         <div
@@ -143,15 +143,15 @@ export const GenomicTimeline: React.FC = () => {
                                     <div
                                         className="w-full px-2.5 py-2.5 rounded-xl text-center transition-all duration-200"
                                         style={{
-                                            background: hoveredStep === step.step ? `${step.color}08` : '#F9FAFB',
-                                            border: `1px solid ${hoveredStep === step.step ? step.color + '30' : '#E5E7EB'}`,
+                                            background: hoveredStep === step.step ? `${step.color}08` : 'var(--bg-muted)',
+                                            border: `1px solid ${hoveredStep === step.step ? step.color + '30' : 'var(--border)'}`,
                                         }}
                                     >
                                         <p className="text-[9px] font-bold mb-0.5 uppercase tracking-wide" style={{ color: step.color }}>
                                             Step {step.step}
                                         </p>
-                                        <p className="text-xs font-semibold mb-0.5 leading-tight" style={{ color: '#1F2937' }}>{step.label}</p>
-                                        <p className="text-[10px] leading-relaxed" style={{ color: '#9CA3AF' }}>{step.description}</p>
+                                        <p className="text-xs font-semibold mb-0.5 leading-tight" style={{ color: 'var(--text-primary)' }}>{step.label}</p>
+                                        <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{step.description}</p>
                                     </div>
 
                                     {/* Hover mini-explainer */}
@@ -163,16 +163,16 @@ export const GenomicTimeline: React.FC = () => {
                                                 exit={{ opacity: 0, y: 6, scale: 0.95 }}
                                                 className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-20 w-56 p-3 rounded-xl text-[10px]"
                                                 style={{
-                                                    background: 'white',
+                                                    background: 'var(--bg-surface)',
                                                     border: `1px solid ${step.color}25`,
-                                                    boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+                                                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
                                                 }}
                                             >
                                                 <div className="flex items-center gap-1 mb-1.5">
                                                     <Info size={9} style={{ color: step.color }} />
                                                     <p className="font-bold" style={{ color: step.color }}>{step.label}</p>
                                                 </div>
-                                                <p style={{ color: '#6B7280' }} className="leading-relaxed">{MINI_EXPLAINERS[i]}</p>
+                                                <p style={{ color: 'var(--text-secondary)' }} className="leading-relaxed">{MINI_EXPLAINERS[i]}</p>
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
@@ -198,16 +198,16 @@ export const GeneExplorer: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="rounded-2xl p-6"
-                style={{ background: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
             >
                 <div className="flex items-center gap-2 mb-5">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                        style={{ background: '#E6F5F5', border: '1px solid #CCE9EA' }}>
-                        <Dna size={15} style={{ color: '#0D7377' }} />
+                        style={{ background: 'var(--primary-light)', border: '1px solid var(--border)' }}>
+                        <Dna size={15} style={{ color: 'var(--primary)' }} />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-sm" style={{ color: '#1F2937' }}>Interactive Gene Explorer</h3>
-                        <p className="text-[10px]" style={{ color: '#9CA3AF' }}>Click any gene for full details</p>
+                        <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Interactive Gene Explorer</h3>
+                        <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Click any gene for full details</p>
                     </div>
                 </div>
 
@@ -223,9 +223,9 @@ export const GeneExplorer: React.FC = () => {
                             onClick={() => setSelectedGene(gene)}
                             className="relative group px-4 py-2.5 rounded-xl font-mono font-bold text-sm"
                             style={{
-                                background: '#E6F5F5',
-                                border: '1px solid #CCE9EA',
-                                color: '#0D7377',
+                                background: 'var(--primary-light)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--primary)',
                             }}
                         >
                             <span className="relative z-10">{gene.name}</span>
@@ -234,7 +234,7 @@ export const GeneExplorer: React.FC = () => {
                     ))}
                 </div>
 
-                <div className="mt-4 flex items-center gap-2 text-xs" style={{ color: '#9CA3AF' }}>
+                <div className="mt-4 flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
                     <Info size={11} />
                     <span>7 pharmacogenes detected · Click to explore gene details, pathway, and variants</span>
                 </div>
@@ -265,10 +265,10 @@ export const ComplianceBadges: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="rounded-2xl p-6"
-            style={{ background: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
         >
-            <h3 className="font-bold text-sm mb-1" style={{ color: '#1F2937' }}>Audit & Compliance Certificates</h3>
-            <p className="text-[10px] mb-5" style={{ color: '#9CA3AF' }}>All standards verified for clinical research use</p>
+            <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>Audit & Compliance Certificates</h3>
+            <p className="text-[10px] mb-5" style={{ color: 'var(--text-muted)' }}>All standards verified for clinical research use</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {badges.map((badge, i) => (
                     <motion.div
@@ -285,7 +285,7 @@ export const ComplianceBadges: React.FC = () => {
                     >
                         <div className="text-2xl mb-2">{badge.icon}</div>
                         <p className="font-semibold mb-1 leading-tight" style={{ color: badge.color }}>{badge.label}</p>
-                        <p className="text-[9px] leading-relaxed" style={{ color: '#9CA3AF' }}>{badge.desc}</p>
+                        <p className="text-[9px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{badge.desc}</p>
                     </motion.div>
                 ))}
             </div>
@@ -354,7 +354,7 @@ export const MultiPatientSimulation: React.FC = () => {
         <div className="space-y-4">
             <div className="flex items-center gap-2 mb-2">
                 <Users size={15} style={{ color: '#7C3AED' }} />
-                <p className="text-sm font-bold" style={{ color: '#1F2937' }}>Side-by-Side Risk Comparison</p>
+                <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Side-by-Side Risk Comparison</p>
                 <span className="px-2 py-0.5 rounded text-[9px] font-bold ml-auto"
                     style={{ background: '#F5F3FF', border: '1px solid #EDE9FE', color: '#7C3AED' }}>
                     DEMO · Anonymized
@@ -369,16 +369,16 @@ export const MultiPatientSimulation: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: pi * 0.12 }}
                         className="rounded-2xl overflow-hidden"
-                        style={{ border: '1px solid #E5E7EB', background: 'white' }}
+                        style={{ border: '1px solid var(--border)', background: 'var(--bg-surface)' }}
                     >
                         {/* Patient header */}
                         <div className="px-4 py-3"
                             style={{
-                                background: pi === 0 ? '#E6F5F5' : '#F5F3FF',
-                                borderBottom: '1px solid #F3F4F6'
+                                background: pi === 0 ? 'var(--primary-light)' : '#F5F3FF',
+                                borderBottom: '1px solid var(--border)'
                             }}>
-                            <p className="text-xs font-bold" style={{ color: '#1F2937' }}>{patient.name}</p>
-                            <p className="text-[10px] font-mono mt-0.5" style={{ color: '#9CA3AF' }}>{patient.id} · {patient.genotype}</p>
+                            <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{patient.name}</p>
+                            <p className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--text-muted)' }}>{patient.id} · {patient.genotype}</p>
                         </div>
 
                         {/* Risk grid */}
@@ -392,7 +392,7 @@ export const MultiPatientSimulation: React.FC = () => {
                                     className="flex items-center justify-between px-3 py-1.5 rounded-lg"
                                     style={{ background: `${risk.color}06`, border: `1px solid ${risk.color}15` }}
                                 >
-                                    <span className="text-xs font-medium" style={{ color: '#4B5563' }}>{risk.drug}</span>
+                                    <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{risk.drug}</span>
                                     <span className="text-[10px] font-bold px-2 py-0.5 rounded"
                                         style={{ background: `${risk.color}10`, color: risk.color }}>
                                         {risk.level.toUpperCase()}
@@ -403,7 +403,7 @@ export const MultiPatientSimulation: React.FC = () => {
 
                         {/* Risk summary */}
                         <div className="px-4 py-2.5 flex gap-2 flex-wrap"
-                            style={{ borderTop: '1px solid #F3F4F6', background: '#F9FAFB' }}>
+                            style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-muted)' }}>
                             {['toxic', 'adjust', 'ineffective', 'safe'].map(lvl => {
                                 const cnt = patient.risks.filter(r => r.level === lvl).length;
                                 if (!cnt) return null;
@@ -429,10 +429,10 @@ export const MultiPatientSimulation: React.FC = () => {
                 style={{ background: '#F5F3FF', border: '1px solid #EDE9FE' }}
             >
                 <p className="font-semibold mb-1.5" style={{ color: '#7C3AED' }}>Key Risk Differences Detected</p>
-                <div className="space-y-1" style={{ color: '#6B7280' }}>
-                    <p>• <strong style={{ color: '#1F2937' }}>Codeine</strong>: Patient A → Toxic (CYP2D6 UM) vs Patient B → Ineffective (CYP2D6 PM)</p>
-                    <p>• <strong style={{ color: '#1F2937' }}>Fluorouracil</strong>: Patient A → Safe (Normal DPYD) vs Patient B → Toxic (DPYD deficient)</p>
-                    <p>• <strong style={{ color: '#1F2937' }}>Clopidogrel</strong>: Patient A → Ineffective (CYP2C19 IM) vs Patient B → Safe (NM)</p>
+                <div className="space-y-1" style={{ color: 'var(--text-secondary)' }}>
+                    <p>• <strong style={{ color: 'var(--text-primary)' }}>Codeine</strong>: Patient A → Toxic (CYP2D6 UM) vs Patient B → Ineffective (CYP2D6 PM)</p>
+                    <p>• <strong style={{ color: 'var(--text-primary)' }}>Fluorouracil</strong>: Patient A → Safe (Normal DPYD) vs Patient B → Toxic (DPYD deficient)</p>
+                    <p>• <strong style={{ color: 'var(--text-primary)' }}>Clopidogrel</strong>: Patient A → Ineffective (CYP2C19 IM) vs Patient B → Safe (NM)</p>
                 </div>
             </motion.div>
         </div>
@@ -453,13 +453,13 @@ export const AIExplainabilityPanel: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl p-6"
-            style={{ background: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
         >
             <div className="flex items-center gap-2 mb-4">
-                <Brain size={15} style={{ color: '#0D7377' }} />
-                <h3 className="text-sm font-semibold" style={{ color: '#1F2937' }}>AI Pathway Summary</h3>
+                <Brain size={15} style={{ color: 'var(--primary)' }} />
+                <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>AI Pathway Summary</h3>
                 <span className="ml-auto px-2 py-0.5 rounded text-[10px] font-medium"
-                    style={{ background: '#E6F5F5', color: '#0D7377', border: '1px solid #CCE9EA' }}>XAI</span>
+                    style={{ background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--border)' }}>XAI</span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
                 {steps.map((step, i) => (
@@ -483,9 +483,9 @@ export const AIExplainabilityPanel: React.FC = () => {
                                 animate={{ opacity: 1, scaleX: 1 }}
                                 transition={{ delay: i * 0.12 + 0.1 }}
                                 className="flex items-center"
-                                style={{ color: '#D1D5DB' }}
+                                style={{ color: 'var(--border)' }}
                             >
-                                <div className="h-px w-4" style={{ background: '#E5E7EB' }} />
+                                <div className="h-px w-4" style={{ background: 'var(--border)' }} />
                                 <ArrowRight size={10} />
                             </motion.div>
                         )}

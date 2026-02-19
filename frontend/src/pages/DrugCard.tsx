@@ -36,11 +36,11 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
             onHoverEnd={() => setIsHovered(false)}
             className="rounded-2xl overflow-hidden"
             style={{
-                background: 'white',
-                border: `1px solid ${isHovered ? riskColor + '40' : '#E5E7EB'}`,
+                background: 'var(--bg-surface)',
+                border: `1px solid ${isHovered ? riskColor + '40' : 'var(--border)'}`,
                 boxShadow: isHovered
-                    ? `0 8px 25px ${riskColor}10, 0 1px 3px rgba(0,0,0,0.05)`
-                    : '0 1px 3px rgba(0,0,0,0.05)',
+                    ? `0 8px 25px ${riskColor}10, var(--shadow-sm)`
+                    : 'var(--shadow-sm)',
                 transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
@@ -50,7 +50,7 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                 {/* Top row: drug name + risk label */}
                 <div className="flex items-start justify-between mb-4">
                     <div>
-                        <h3 className="text-lg font-bold mb-0.5" style={{ color: '#1F2937' }}>{drug.drug}</h3>
+                        <h3 className="text-lg font-bold mb-0.5" style={{ color: 'var(--text-primary)' }}>{drug.drug}</h3>
                         <div className="flex items-center gap-2">
                             <span
                                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
@@ -140,9 +140,9 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                         onClick={() => setIsExpanded(!isExpanded)}
                         className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200"
                         style={{
-                            background: '#F9FAFB',
-                            border: '1px solid #E5E7EB',
-                            color: '#6B7280',
+                            background: 'var(--bg-muted)',
+                            border: '1px solid var(--border)',
+                            color: 'var(--text-secondary)',
                         }}
                     >
                         {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -177,7 +177,7 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                     >
                         <div
                             className="mx-4 mb-4 p-4 rounded-xl space-y-4"
-                            style={{ background: '#F9FAFB', border: '1px solid #F3F4F6' }}
+                            style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}
                         >
                             {/* Detected variants table */}
                             <div>
@@ -186,22 +186,22 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                                     <Dna size={11} />
                                     Detected Variants
                                 </h4>
-                                <div className="overflow-x-auto rounded-lg" style={{ border: '1px solid #E5E7EB' }}>
+                                <div className="overflow-x-auto rounded-lg" style={{ border: '1px solid var(--border)' }}>
                                     <table className="w-full text-xs">
                                         <thead>
-                                            <tr style={{ background: '#E6F5F5' }}>
+                                            <tr style={{ background: 'var(--primary-light)' }}>
                                                 {['Gene', 'rsID', 'Diplotype', 'Phenotype'].map(h => (
-                                                    <th key={h} className="px-3 py-2 text-left font-medium" style={{ color: '#0D7377' }}>{h}</th>
+                                                    <th key={h} className="px-3 py-2 text-left font-medium" style={{ color: 'var(--primary)' }}>{h}</th>
                                                 ))}
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {drug.variants.map((v, i) => (
-                                                <tr key={i} style={{ borderTop: i > 0 ? '1px solid #F3F4F6' : 'none', background: 'white' }}>
-                                                    <td className="px-3 py-2 font-mono font-medium" style={{ color: '#0D7377' }}>{v.gene}</td>
-                                                    <td className="px-3 py-2 font-mono" style={{ color: '#6B7280' }}>{v.rsId}</td>
-                                                    <td className="px-3 py-2 font-mono" style={{ color: '#059669' }}>{v.diplotype}</td>
-                                                    <td className="px-3 py-2" style={{ color: '#4B5563' }}>{v.phenotype}</td>
+                                                <tr key={i} style={{ borderTop: i > 0 ? '1px solid var(--border)' : 'none', background: 'var(--bg-surface)' }}>
+                                                    <td className="px-3 py-2 font-mono font-medium" style={{ color: 'var(--primary)' }}>{v.gene}</td>
+                                                    <td className="px-3 py-2 font-mono" style={{ color: 'var(--text-secondary)' }}>{v.rsId}</td>
+                                                    <td className="px-3 py-2 font-mono" style={{ color: 'var(--success)' }}>{v.diplotype}</td>
+                                                    <td className="px-3 py-2" style={{ color: 'var(--text-secondary)' }}>{v.phenotype}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -211,25 +211,25 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
 
                             {/* Clinical summary */}
                             <div>
-                                <h4 className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#9CA3AF' }}>Clinical Summary</h4>
-                                <p className="text-xs leading-relaxed" style={{ color: '#4B5563' }}>{drug.clinicalSummary}</p>
+                                <h4 className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Clinical Summary</h4>
+                                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{drug.clinicalSummary}</p>
                             </div>
 
                             {/* Mechanism */}
                             <div>
-                                <h4 className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#9CA3AF' }}>Biological Mechanism</h4>
-                                <p className="text-xs leading-relaxed" style={{ color: '#4B5563' }}>{drug.mechanism}</p>
+                                <h4 className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Biological Mechanism</h4>
+                                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{drug.mechanism}</p>
                             </div>
 
                             {/* CPIC guideline */}
                             <div
                                 className="p-3 rounded-lg"
-                                style={{ background: '#E6F5F5', border: '1px solid #CCE9EA' }}
+                                style={{ background: 'var(--primary-light)', border: '1px solid var(--border)' }}
                             >
-                                <h4 className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#0D7377' }}>
+                                <h4 className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--primary)' }}>
                                     CPIC Guideline Recommendation
                                 </h4>
-                                <p className="text-xs leading-relaxed" style={{ color: '#4B5563' }}>{drug.cpicGuideline}</p>
+                                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{drug.cpicGuideline}</p>
                             </div>
 
                             {/* Recommendation */}
@@ -243,7 +243,7 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, index, onViewJSON }) => {
                                 <h4 className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: riskColor }}>
                                     Clinical Action
                                 </h4>
-                                <p className="text-xs leading-relaxed" style={{ color: '#4B5563' }}>{drug.recommendation}</p>
+                                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{drug.recommendation}</p>
                             </div>
                         </div>
                     </motion.div>

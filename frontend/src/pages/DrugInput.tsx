@@ -69,8 +69,8 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                     <FlaskConical size={12} />
                     Step 2 of 2
                 </div>
-                <h2 className="text-4xl font-black mb-3" style={{ color: '#1F2937' }}>Select Medications</h2>
-                <p style={{ color: '#6B7280' }} className="max-w-xl mx-auto">
+                <h2 className="text-4xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>Select Medications</h2>
+                <p style={{ color: 'var(--text-secondary)' }} className="max-w-xl mx-auto">
                     Choose the drugs you want to analyze for pharmacogenomic interactions and risk assessment.
                 </p>
             </motion.div>
@@ -82,14 +82,14 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="p-6 rounded-2xl"
                 style={{
-                    background: 'white',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    background: 'var(--bg-surface)',
+                    border: '1px solid var(--border)',
+                    boxShadow: 'var(--shadow-sm)',
                 }}
             >
                 {/* Drug selector */}
                 <div className="relative mb-4" ref={dropdownRef}>
-                    <label className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                         Select Drugs for Analysis
                     </label>
 
@@ -135,9 +135,9 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                             placeholder="Search drugs (e.g., Warfarin, Codeine...)"
                             className="w-full pl-10 pr-10 py-3 rounded-xl text-sm outline-none transition-all duration-300"
                             style={{
-                                background: '#F9FAFB',
-                                border: '1px solid #E5E7EB',
-                                color: '#1F2937',
+                                background: 'var(--bg-muted)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--text-primary)',
                             }}
                             onFocusCapture={(e) => {
                                 (e.target as HTMLInputElement).style.borderColor = '#0D7377';
@@ -161,9 +161,9 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                                 transition={{ duration: 0.15 }}
                                 className="absolute z-20 left-0 right-0 mt-2 rounded-xl overflow-hidden"
                                 style={{
-                                    background: 'white',
-                                    border: '1px solid #E5E7EB',
-                                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                                    background: 'var(--bg-surface)',
+                                    border: '1px solid var(--border)',
+                                    boxShadow: 'var(--shadow-lg)',
                                     transformOrigin: 'top',
                                 }}
                             >
@@ -182,8 +182,8 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                                             transition={{ delay: i * 0.03 }}
                                             onMouseDown={() => toggleDrug(drug)}
                                             className="w-full flex items-center justify-between px-4 py-3 text-left transition-colors duration-150"
-                                            style={{ color: '#1F2937' }}
-                                            onMouseEnter={(e) => { e.currentTarget.style.background = '#F3F4F6'; }}
+                                            style={{ color: 'var(--text-primary)' }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-muted)'; }}
                                             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                                         >
                                             <div className="flex items-center gap-3">
@@ -233,9 +233,9 @@ const DrugInput: React.FC<DrugInputProps> = ({ onDrugsSelected, onAnalyze, hasFi
                                 style={{
                                     background: selectedDrugs.includes(drug)
                                         ? `${DRUG_INFO[drug].color}08`
-                                        : '#F9FAFB',
-                                    border: `1px solid ${selectedDrugs.includes(drug) ? `${DRUG_INFO[drug].color}30` : '#E5E7EB'}`,
-                                    color: selectedDrugs.includes(drug) ? DRUG_INFO[drug].color : '#6B7280',
+                                        : 'var(--bg-muted)',
+                                    border: `1px solid ${selectedDrugs.includes(drug) ? `${DRUG_INFO[drug].color}30` : 'var(--border)'}`,
+                                    color: selectedDrugs.includes(drug) ? DRUG_INFO[drug].color : 'var(--text-secondary)',
                                 }}
                             >
                                 <span

@@ -58,27 +58,27 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
                             onClick={e => e.stopPropagation()}
                             className="w-full max-w-2xl rounded-2xl overflow-hidden"
                             style={{
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
                             }}
                         >
                             {/* Header */}
                             <div
                                 className="px-6 py-5 flex items-start justify-between"
-                                style={{ borderBottom: '1px solid #F3F4F6' }}
+                                style={{ borderBottom: '1px solid var(--border)' }}
                             >
                                 <div className="flex items-center gap-3">
                                     <div
                                         className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                                        style={{ background: '#E6F5F5', border: '1px solid #CCE9EA' }}
+                                        style={{ background: 'var(--primary-light)', border: '1px solid var(--border)' }}
                                     >
                                         <Dna style={{ color: '#0D7377' }} size={22} />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-mono mb-0.5 uppercase tracking-widest" style={{ color: '#0D7377' }}>Pharmacogene Detail</p>
-                                        <h2 className="text-2xl font-black font-mono" style={{ color: '#1F2937' }}>{gene.name}</h2>
-                                        <p className="text-xs mt-0.5" style={{ color: '#6B7280' }}>{gene.function}</p>
+                                        <p className="text-[10px] font-mono mb-0.5 uppercase tracking-widest" style={{ color: 'var(--primary)' }}>Pharmacogene Detail</p>
+                                        <h2 className="text-2xl font-black font-mono" style={{ color: 'var(--text-primary)' }}>{gene.name}</h2>
+                                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{gene.function}</p>
                                     </div>
                                 </div>
                                 <motion.button
@@ -86,7 +86,7 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
                                     whileTap={{ scale: 0.9 }}
                                     onClick={onClose}
                                     className="p-2 rounded-lg transition-colors"
-                                    style={{ color: '#9CA3AF', background: '#F9FAFB', border: '1px solid #E5E7EB' }}
+                                    style={{ color: 'var(--text-muted)', background: 'var(--bg-muted)', border: '1px solid var(--border)' }}
                                 >
                                     <X size={16} />
                                 </motion.button>
@@ -107,28 +107,28 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
                                             style={{ background: `${stat.color}08`, border: `1px solid ${stat.color}18` }}
                                         >
                                             <div className="flex justify-center mb-1.5" style={{ color: stat.color }}>{stat.icon}</div>
-                                            <p className="text-[9px] mb-0.5 uppercase tracking-wider" style={{ color: '#9CA3AF' }}>{stat.label}</p>
+                                            <p className="text-[9px] mb-0.5 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{stat.label}</p>
                                             <p className="text-sm font-bold" style={{ color: stat.color }}>{stat.value}</p>
                                         </div>
                                     ))}
                                 </div>
 
                                 {/* Metabolic pathway */}
-                                <div className="rounded-xl p-4" style={{ background: '#F5F3FF', border: '1px solid #EDE9FE' }}>
+                                <div className="rounded-xl p-4" style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.15)' }}>
                                     <div className="flex items-center gap-2 mb-2">
                                         <Activity size={13} style={{ color: '#7C3AED' }} />
                                         <p className="text-xs font-semibold" style={{ color: '#7C3AED' }}>Metabolic Pathway</p>
                                     </div>
-                                    <p className="text-xs leading-relaxed" style={{ color: '#6B7280' }}>{pathwayDetail}</p>
+                                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{pathwayDetail}</p>
                                 </div>
 
                                 {/* Clinical importance */}
-                                <div className="rounded-xl p-4" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                                <div className="rounded-xl p-4" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)' }}>
                                     <div className="flex items-center gap-2 mb-2">
                                         <AlertCircle size={13} style={{ color: '#DC2626' }} />
                                         <p className="text-xs font-semibold" style={{ color: '#DC2626' }}>Clinical Importance</p>
                                     </div>
-                                    <p className="text-xs leading-relaxed" style={{ color: '#6B7280' }}>{clinicalImportance}</p>
+                                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{clinicalImportance}</p>
                                 </div>
 
                                 {/* Affected drugs */}
@@ -145,7 +145,7 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 transition={{ delay: i * 0.05 }}
                                                 className="px-3 py-1 rounded-full text-xs font-medium"
-                                                style={{ background: '#FFFBEB', border: '1px solid #FDE68A', color: '#D97706' }}
+                                                style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.2)', color: '#D97706' }}
                                             >
                                                 {drug}
                                             </motion.span>
@@ -156,8 +156,8 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
                                 {/* Star allele variants */}
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
-                                        <BookOpen size={13} style={{ color: '#0D7377' }} />
-                                        <p className="text-xs font-semibold" style={{ color: '#0D7377' }}>Known Allele Variants</p>
+                                        <BookOpen size={13} style={{ color: 'var(--primary)' }} />
+                                        <p className="text-xs font-semibold" style={{ color: 'var(--primary)' }}>Known Allele Variants</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {gene.variants.map((v, i) => (
@@ -167,7 +167,7 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: i * 0.04 }}
                                                 className="px-2.5 py-1 rounded-lg text-xs font-mono"
-                                                style={{ background: '#E6F5F5', border: '1px solid #CCE9EA', color: '#0D7377' }}
+                                                style={{ background: 'var(--primary-light)', border: '1px solid var(--border)', color: 'var(--primary)' }}
                                             >
                                                 {gene.name} {v}
                                             </motion.span>
@@ -177,14 +177,14 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
 
                                 {/* CPIC note */}
                                 <div className="rounded-xl p-3 flex items-start gap-3"
-                                    style={{ background: '#ECFDF5', border: '1px solid #D1FAE5' }}>
+                                    style={{ background: 'var(--success-light)', border: '1px solid var(--border)' }}>
                                     <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5"
-                                        style={{ background: '#D1FAE5' }}>
-                                        <span className="text-[10px] font-bold" style={{ color: '#059669' }}>C</span>
+                                        style={{ background: 'rgba(5,150,105,0.15)' }}>
+                                        <span className="text-[10px] font-bold" style={{ color: 'var(--success)' }}>C</span>
                                     </div>
-                                    <p className="text-[10px] leading-relaxed" style={{ color: '#6B7280' }}>
-                                        CPIC guidelines available for <span className="font-semibold" style={{ color: '#059669' }}>{gene.name}</span>. Clinical dosing recommendations are based on PharmGKB Level A evidence.
-                                        Visit <span style={{ color: '#059669' }}>cpicpgx.org</span> for full guideline documentation.
+                                    <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                                        CPIC guidelines available for <span className="font-semibold" style={{ color: 'var(--success)' }}>{gene.name}</span>. Clinical dosing recommendations are based on PharmGKB Level A evidence.
+                                        Visit <span style={{ color: 'var(--success)' }}>cpicpgx.org</span> for full guideline documentation.
                                     </p>
                                 </div>
                             </div>
@@ -192,14 +192,14 @@ const GeneModal: React.FC<GeneModalProps> = ({ gene, onClose }) => {
                             {/* Footer */}
                             <div
                                 className="px-6 py-4 flex justify-end"
-                                style={{ borderTop: '1px solid #F3F4F6' }}
+                                style={{ borderTop: '1px solid var(--border)' }}
                             >
                                 <motion.button
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
                                     onClick={onClose}
                                     className="px-4 py-2 rounded-xl text-sm font-medium"
-                                    style={{ background: '#E6F5F5', border: '1px solid #CCE9EA', color: '#0D7377' }}
+                                    style={{ background: 'var(--primary-light)', border: '1px solid var(--border)', color: 'var(--primary)' }}
                                 >
                                     Close
                                 </motion.button>

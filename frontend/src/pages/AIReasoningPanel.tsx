@@ -117,33 +117,33 @@ const AIReasoningPanel: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl overflow-hidden"
             style={{
-                background: 'white',
-                border: '1px solid #E5E7EB',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-sm)',
             }}
         >
             {/* Header */}
             <button
                 onClick={() => setIsExpanded(v => !v)}
                 className="w-full px-6 py-4 flex items-center gap-3 transition-colors"
-                style={{ borderBottom: isExpanded ? '1px solid #F3F4F6' : 'none' }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#F9FAFB'; }}
+                style={{ borderBottom: isExpanded ? '1px solid var(--border)' : 'none' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-muted)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
             >
                 <div
                     className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: '#E6F5F5', border: '1px solid #CCE9EA' }}
+                    style={{ background: 'var(--primary-light)', border: '1px solid var(--border)' }}
                 >
                     <Brain size={17} style={{ color: '#0D7377' }} />
                 </div>
                 <div className="flex-1 text-left">
-                    <p className="text-sm font-bold" style={{ color: '#1F2937' }}>AI Reasoning Transparency</p>
-                    <p className="text-[10px]" style={{ color: '#9CA3AF' }}>Why this risk was predicted · 7-stage pipeline</p>
+                    <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>AI Reasoning Transparency</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Why this risk was predicted · 7-stage pipeline</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <span
                         className="px-2 py-0.5 rounded text-[10px] font-semibold"
-                        style={{ background: '#E6F5F5', border: '1px solid #CCE9EA', color: '#0D7377' }}
+                        style={{ background: 'var(--primary-light)', border: '1px solid var(--border)', color: 'var(--primary)' }}
                     >
                         XAI v2.0
                     </span>
@@ -164,7 +164,7 @@ const AIReasoningPanel: React.FC = () => {
                         <div className="p-6 space-y-6" ref={containerRef}>
                             {/* Pipeline nodes */}
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: '#9CA3AF' }}>
+                                <p className="text-[10px] font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>
                                     Medical Neural Pipeline
                                 </p>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 relative">
@@ -181,8 +181,8 @@ const AIReasoningPanel: React.FC = () => {
                                                     whileHover={{ scale: 1.04, y: -2 }}
                                                     className="p-2.5 rounded-xl text-center select-none transition-all duration-200"
                                                     style={{
-                                                        background: activeNode === node.id ? `${node.color}10` : '#F9FAFB',
-                                                        border: `1px solid ${activeNode === node.id ? node.color + '40' : '#E5E7EB'}`,
+                                                        background: activeNode === node.id ? `${node.color}10` : 'var(--bg-muted)',
+                                                        border: `1px solid ${activeNode === node.id ? node.color + '40' : 'var(--border)'}`,
                                                     }}
                                                 >
                                                     <div
@@ -191,11 +191,11 @@ const AIReasoningPanel: React.FC = () => {
                                                     >
                                                         {node.icon}
                                                     </div>
-                                                    <p className="text-[9px] mb-0.5 leading-tight" style={{ color: '#9CA3AF' }}>{node.label}</p>
+                                                    <p className="text-[9px] mb-0.5 leading-tight" style={{ color: 'var(--text-muted)' }}>{node.label}</p>
                                                     <p className="text-[10px] font-bold leading-tight font-mono" style={{ color: node.color }}>
                                                         {node.sublabel}
                                                     </p>
-                                                    <p className="text-[9px] mt-0.5" style={{ color: '#9CA3AF' }}>{node.value}</p>
+                                                    <p className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{node.value}</p>
                                                 </motion.div>
 
                                                 <div
@@ -276,7 +276,7 @@ const AIReasoningPanel: React.FC = () => {
                                                     style={{ color: PIPELINE_NODES.find(n => n.id === activeNode)?.color }}>
                                                     {PIPELINE_NODES.find(n => n.id === activeNode)?.label}: {PIPELINE_NODES.find(n => n.id === activeNode)?.sublabel}
                                                 </p>
-                                                <p className="text-xs leading-relaxed" style={{ color: '#6B7280' }}>
+                                                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                                                     {PIPELINE_NODES.find(n => n.id === activeNode)?.tooltip}
                                                 </p>
                                             </div>
@@ -287,7 +287,7 @@ const AIReasoningPanel: React.FC = () => {
 
                             {/* Feature Importance */}
                             <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: '#9CA3AF' }}>
+                                <p className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
                                     Prediction Feature Importance
                                 </p>
                                 <div className="space-y-2.5">
@@ -299,7 +299,7 @@ const AIReasoningPanel: React.FC = () => {
                                             transition={{ delay: i * 0.08 + 0.2 }}
                                         >
                                             <div className="flex justify-between text-xs mb-1">
-                                                <span style={{ color: '#6B7280' }}>{item.feature}</span>
+                                                <span style={{ color: 'var(--text-secondary)' }}>{item.feature}</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[9px] px-1.5 py-0.5 rounded"
                                                         style={{ background: `${item.color}10`, color: item.color }}>
@@ -310,7 +310,7 @@ const AIReasoningPanel: React.FC = () => {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
+                                            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-muted)' }}>
                                                 <motion.div
                                                     className="h-full rounded-full"
                                                     initial={{ width: 0 }}
@@ -326,12 +326,12 @@ const AIReasoningPanel: React.FC = () => {
 
                             {/* Overall confidence */}
                             <div className="flex items-center justify-between p-4 rounded-xl"
-                                style={{ background: '#ECFDF5', border: '1px solid #D1FAE5' }}>
+                                style={{ background: 'var(--success-light)', border: '1px solid var(--border)' }}>
                                 <div>
-                                    <p className="text-xs font-bold" style={{ color: '#059669' }}>Overall AI Confidence</p>
-                                    <p className="text-[10px] mt-0.5" style={{ color: '#6B7280' }}>Based on CPIC Grade A evidence + variant quality</p>
+                                    <p className="text-xs font-bold" style={{ color: 'var(--success)' }}>Overall AI Confidence</p>
+                                    <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>Based on CPIC Grade A evidence + variant quality</p>
                                 </div>
-                                <div className="text-3xl font-black font-mono" style={{ color: '#059669' }}>94%</div>
+                                <div className="text-3xl font-black font-mono" style={{ color: 'var(--success)' }}>94%</div>
                             </div>
                         </div>
                     </motion.div>

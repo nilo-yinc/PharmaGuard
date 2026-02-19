@@ -114,9 +114,9 @@ const ExportCenter: React.FC = () => {
                 onClick={() => setIsOpen(v => !v)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold"
                 style={{
-                    background: '#E6F5F5',
-                    border: '1px solid #CCE9EA',
-                    color: '#0D7377',
+                    background: 'var(--primary-light)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--primary)',
                 }}
             >
                 <Download size={15} />
@@ -138,14 +138,14 @@ const ExportCenter: React.FC = () => {
                             transition={{ duration: 0.2, ease: 'easeOut' }}
                             className="absolute right-0 top-full mt-2 z-50 w-72 rounded-2xl overflow-hidden"
                             style={{
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                             }}
                         >
-                            <div className="px-4 py-3" style={{ borderBottom: '1px solid #F3F4F6' }}>
-                                <p className="text-xs font-bold" style={{ color: '#1F2937' }}>Export Center</p>
-                                <p className="text-[10px]" style={{ color: '#9CA3AF' }}>Sample: {MOCK_ANALYSIS_RESULT.sampleId}</p>
+                            <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                                <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>Export Center</p>
+                                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Sample: {MOCK_ANALYSIS_RESULT.sampleId}</p>
                             </div>
                             <div className="p-2">
                                 {OPTIONS.map((opt, i) => (
@@ -156,7 +156,7 @@ const ExportCenter: React.FC = () => {
                                         transition={{ delay: i * 0.04 }}
                                         onClick={() => { opt.action(); if (opt.id !== 'copy') setIsOpen(false); }}
                                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors group"
-                                        onMouseEnter={(e) => { e.currentTarget.style.background = '#F9FAFB'; }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-muted)'; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                                     >
                                         <div
@@ -166,10 +166,10 @@ const ExportCenter: React.FC = () => {
                                             {opt.icon}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-semibold" style={{ color: '#1F2937' }}>
+                                            <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
                                                 {opt.label}
                                             </p>
-                                            <p className="text-[10px] truncate" style={{ color: '#9CA3AF' }}>{opt.desc}</p>
+                                            <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>{opt.desc}</p>
                                         </div>
                                         {opt.id === 'copy' && copiedId === 'copy' && (
                                             <Check size={12} style={{ color: '#059669' }} className="flex-shrink-0" />
@@ -177,8 +177,8 @@ const ExportCenter: React.FC = () => {
                                     </motion.button>
                                 ))}
                             </div>
-                            <div className="px-4 py-2.5" style={{ borderTop: '1px solid #F3F4F6' }}>
-                                <p className="text-[9px] text-center" style={{ color: '#9CA3AF' }}>
+                            <div className="px-4 py-2.5" style={{ borderTop: '1px solid var(--border)' }}>
+                                <p className="text-[9px] text-center" style={{ color: 'var(--text-muted)' }}>
                                     🔐 Data processed locally · No cloud storage
                                 </p>
                             </div>

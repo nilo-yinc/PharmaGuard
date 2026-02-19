@@ -215,7 +215,7 @@ const Navbar: React.FC = () => {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                         className="md:hidden overflow-hidden"
-                        style={{ background: 'white', borderTop: '1px solid #F3F4F6' }}
+                        style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border)' }}
                     >
                         <div className="px-4 py-3 space-y-1">
                             {navLinks.map((link) => (

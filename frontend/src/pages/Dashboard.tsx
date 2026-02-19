@@ -81,9 +81,9 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedDrugs }) => {
                         </span>
                         <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#059669' }} />
                     </div>
-                    <h2 className="text-2xl font-black mb-0.5" style={{ color: '#1F2937' }}>Pharmacogenomic Report</h2>
-                    <p className="text-xs" style={{ color: '#9CA3AF' }}>
-                        Sample: <span className="font-mono" style={{ color: '#6B7280' }}>{result.sampleId}</span>
+                    <h2 className="text-2xl font-black mb-0.5" style={{ color: 'var(--text-primary)' }}>Pharmacogenomic Report</h2>
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        Sample: <span className="font-mono" style={{ color: 'var(--text-secondary)' }}>{result.sampleId}</span>
                         {' · '}{filteredDrugs.length} drug{filteredDrugs.length !== 1 ? 's' : ''} analysed
                     </p>
                 </div>
@@ -97,9 +97,9 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedDrugs }) => {
                         onClick={() => setPrivacyMode(v => !v)}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium"
                         style={{
-                            background: privacyMode ? '#FFFBEB' : '#F9FAFB',
-                            border: `1px solid ${privacyMode ? '#FDE68A' : '#E5E7EB'}`,
-                            color: privacyMode ? '#D97706' : '#9CA3AF',
+                            background: privacyMode ? '#FFFBEB' : 'var(--bg-muted)',
+                            border: `1px solid ${privacyMode ? '#FDE68A' : 'var(--border)'}`,
+                            color: privacyMode ? '#D97706' : 'var(--text-muted)',
                         }}
                     >
                         {privacyMode ? <Lock size={12} /> : <Eye size={12} />}
@@ -124,9 +124,9 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedDrugs }) => {
                         }}
                         className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap flex-shrink-0 transition-colors duration-150"
                         style={{
-                            background: activeTab === tab.id ? '#E6F5F5' : '#F9FAFB',
-                            border: `1px solid ${activeTab === tab.id ? '#CCE9EA' : '#E5E7EB'}`,
-                            color: activeTab === tab.id ? '#0D7377' : '#9CA3AF',
+                            background: activeTab === tab.id ? 'var(--primary-light)' : 'var(--bg-muted)',
+                            border: `1px solid ${activeTab === tab.id ? 'var(--border-hover)' : 'var(--border)'}`,
+                            color: activeTab === tab.id ? 'var(--primary)' : 'var(--text-muted)',
                         }}
                     >
                         {tab.icon}

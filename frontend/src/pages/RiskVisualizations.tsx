@@ -30,9 +30,10 @@ const RiskMeter: React.FC<{ score: number }> = ({ score }) => {
                     <path
                         d={`M 20 100 A ${radius} ${radius} 0 0 1 160 100`}
                         fill="none"
-                        stroke="#F3F4F6"
+                        stroke="currentColor"
                         strokeWidth="12"
                         strokeLinecap="round"
+                        className="text-gray-200 dark:text-gray-800"
                     />
                     <motion.path
                         d={`M 20 100 A ${radius} ${radius} 0 0 1 160 100`}
@@ -121,9 +122,9 @@ const RiskVisualizations: React.FC<RiskVisualizationsProps> = ({ result }) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
                     className="p-6 rounded-2xl"
-                    style={{ background: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
                 >
-                    <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--text-muted)' }}>
                         Overall Risk Assessment
                     </h3>
                     <div className="flex flex-col items-center">
@@ -134,8 +135,8 @@ const RiskVisualizations: React.FC<RiskVisualizationsProps> = ({ result }) => {
                         {result.drugs.map(d => (
                             <div key={d.drug} className="flex items-center gap-2 text-xs">
                                 <span className="w-2 h-2 rounded-full" style={{ background: RISK_COLORS[d.riskLevel] }} />
-                                <span style={{ color: '#6B7280' }} className="truncate">{d.drug}</span>
-                                <span className="ml-auto font-mono" style={{ color: '#9CA3AF' }}>{d.confidence}%</span>
+                                <span style={{ color: 'var(--text-secondary)' }} className="truncate">{d.drug}</span>
+                                <span className="ml-auto font-mono" style={{ color: 'var(--text-muted)' }}>{d.confidence}%</span>
                             </div>
                         ))}
                     </div>
@@ -147,22 +148,22 @@ const RiskVisualizations: React.FC<RiskVisualizationsProps> = ({ result }) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
                     className="p-6 rounded-2xl"
-                    style={{ background: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
                 >
-                    <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: '#9CA3AF' }}>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--text-muted)' }}>
                         Multi-Drug Risk Radar
                     </h3>
                     <ResponsiveContainer width="100%" height={280}>
                         <RadarChart data={RADAR_DATA}>
-                            <PolarGrid stroke="#E5E7EB" />
+                            <PolarGrid stroke="var(--border)" />
                             <PolarAngleAxis
                                 dataKey="subject"
-                                tick={{ fill: '#6B7280', fontSize: 11 }}
+                                tick={{ fill: 'var(--text-secondary)', fontSize: 11 }}
                             />
                             <PolarRadiusAxis
                                 angle={90}
                                 domain={[0, 100]}
-                                tick={{ fill: '#9CA3AF', fontSize: 9 }}
+                                tick={{ fill: 'var(--text-muted)', fontSize: 9 }}
                             />
                             {result.drugs.slice(0, 4).map((d, i) => (
                                 <Radar
@@ -181,12 +182,12 @@ const RiskVisualizations: React.FC<RiskVisualizationsProps> = ({ result }) => {
                             />
                             <Tooltip
                                 contentStyle={{
-                                    background: 'white',
-                                    border: '1px solid #E5E7EB',
+                                    background: 'var(--bg-surface)',
+                                    border: '1px solid var(--border)',
                                     borderRadius: '8px',
                                     fontSize: '11px',
-                                    color: '#1F2937',
-                                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                                    color: 'var(--text-primary)',
+                                    boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
                                 }}
                             />
                         </RadarChart>
@@ -200,13 +201,13 @@ const RiskVisualizations: React.FC<RiskVisualizationsProps> = ({ result }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="p-6 rounded-2xl"
-                style={{ background: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
             >
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                         Clinical Risk Heatmap — Genes × Drugs
                     </h3>
-                    <div className="flex items-center gap-3 text-xs" style={{ color: '#9CA3AF' }}>
+                    <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
                         <span className="flex items-center gap-1">
                             <span className="w-2 h-2 rounded" style={{ background: '#F3F4F6' }} />
                             Low

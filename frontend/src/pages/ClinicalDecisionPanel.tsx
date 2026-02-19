@@ -209,9 +209,9 @@ const ClinicalDecisionPanel: React.FC = () => {
                                             )}
                                             {drug.riskLevel === 'safe' && (
                                                 <div className="flex items-center gap-2 p-2.5 rounded-lg"
-                                                    style={{ background: '#ECFDF5', border: '1px solid #D1FAE5' }}>
-                                                    <CheckCircle size={12} style={{ color: '#059669' }} className="flex-shrink-0" />
-                                                    <p className="text-xs" style={{ color: '#059669' }}>Standard therapy is appropriate for this genotype.</p>
+                                                    style={{ background: 'var(--success-light)', border: '1px solid var(--border)' }}>
+                                                    <CheckCircle size={12} style={{ color: 'var(--success)' }} className="flex-shrink-0" />
+                                                    <p className="text-xs" style={{ color: 'var(--success)' }}>Standard therapy is appropriate for this genotype.</p>
                                                 </div>
                                             )}
                                         </div>

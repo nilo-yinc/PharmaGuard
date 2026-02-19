@@ -35,7 +35,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
         >
             {/* Animated Background Elements */}
             <motion.div
-                style={{ y: y1, rotate, opacity }}
                 className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-20 pointer-events-none"
                 style={{ 
                     background: 'radial-gradient(circle, var(--primary-light), transparent 70%)',
@@ -45,7 +44,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                 }}
             />
             <motion.div
-                style={{ y: y2, opacity }}
                 className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-10 pointer-events-none"
                 style={{ 
                     background: 'radial-gradient(circle, var(--accent-light), transparent 70%)',

@@ -16,7 +16,17 @@ const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -61,34 +71,48 @@ const Navbar: React.FC = () => {
 
     return (
         <nav
-            className="sticky top-0 z-50"
+            className="sticky top-0 z-50 transition-all duration-300"
             style={{
                 background: isDark
-                    ? 'rgba(0, 4, 8, 0.82)'
-                    : 'rgba(240, 248, 255, 0.82)',
+                    ? scrolled ? 'rgba(0, 4, 8, 0.92)' : 'rgba(0, 4, 8, 0.82)'
+                    : scrolled ? 'rgba(255, 255, 255, 0.92)' : 'rgba(240, 248, 255, 0.82)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                borderBottom: '1px solid var(--border)',
-                boxShadow: isDark
-                    ? '0 1px 24px rgba(0,0,0,0.5)'
-                    : '0 1px 24px rgba(13,115,119,0.08)',
+                borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
+                boxShadow: scrolled 
+                    ? isDark ? '0 4px 20px rgba(0,0,0,0.6)' : '0 4px 20px rgba(13,115,119,0.1)'
+                    : 'none',
+                height: scrolled ? '60px' : '72px'
             }}
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                <div className="flex items-center justify-between h-full">
                     {/* Left — Logo */}
-                    <Link to="/" className="flex items-center gap-2.5 group">
+                    <Link to="/" className="flex items-center gap-2.5 group perspective-1000">
                         <motion.div
-                            whileHover={{ rotateX: 10, rotateY: -12, scale: 1.06 }}
-                            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                            className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm transition-transform group-hover:scale-105"
-                            style={{ background: 'linear-gradient(135deg, #0D7377, #0A5C5F)', transformStyle: 'preserve-3d' }}
+                            whileHover={{ rotateY: 180 }}
+                            transition={{ type: 'spring', stiffness: 100, damping: 10 }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm relative"
+                            style={{ 
+                                background: 'linear-gradient(135deg, #0D7377, #0A5C5F)', 
+                                transformStyle: 'preserve-3d',
+                                boxShadow: '0 4px 12px rgba(13,115,119,0.3)'
+                            }}
                         >
-                            PG
+                            <span style={{ backfaceVisibility: 'hidden' }}>PG</span>
+                            <span 
+                                style={{ 
+                                    backfaceVisibility: 'hidden', 
+                                    transform: 'rotateY(180deg)',
+                                    position: 'absolute'
+                                }}
+                            >
+                                🧬
+                            </span>
                         </motion.div>
-                        <div>
-                            <p className="font-bold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
-                            <p className="text-[9px] leading-tight" style={{ color: 'var(--text-secondary)' }}>Pharmacogenomics AI</p>
+                        <div className="transition-transform duration-300 group-hover:translate-x-1">
+                            <p className="font-black text-sm leading-none tracking-tight" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
+                            <p className="text-[9px] leading-tight font-medium" style={{ color: 'var(--text-secondary)' }}>Pharmacogenomics AI</p>
                         </div>
                     </Link>
 

@@ -1,12 +1,25 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { ChevronDown, Dna, Shield, Zap, Brain } from 'lucide-react';
+import TiltCard from '../components/TiltCard';
 
 interface HeroSectionProps {
     onAnalyze: () => void;
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start start", "end start"]
+    });
+
+    const y1 = useTransform(scrollYProgress, [0, 1], [0, 200]);
+    const y2 = useTransform(scrollYProgress, [0, 1], [0, -150]);
+    const rotate = useTransform(scrollYProgress, [0, 1], [0, 45]);
+    const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+    const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+
     const stats = [
         { label: 'Genes Analyzed', value: '450+', icon: <Dna size={18} /> },
         { label: 'Drug Interactions', value: '12,000+', icon: <Zap size={18} /> },
@@ -17,33 +30,54 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
     return (
         <section
             id="hero"
+            ref={containerRef}
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
         >
-            {/* Subtle decorative circles */}
-            <div
-                className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-20"
-                style={{ background: 'radial-gradient(circle, var(--primary-light), transparent 70%)' }}
+            {/* Animated Background Elements */}
+            <motion.div
+                style={{ y: y1, rotate, opacity }}
+                className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-20 pointer-events-none"
+                style={{ 
+                    background: 'radial-gradient(circle, var(--primary-light), transparent 70%)',
+                    y: y1,
+                    rotate,
+                    opacity: 0.2
+                }}
             />
-            <div
-                className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-10"
-                style={{ background: 'radial-gradient(circle, var(--accent-light), transparent 70%)' }}
+            <motion.div
+                style={{ y: y2, opacity }}
+                className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-10 pointer-events-none"
+                style={{ 
+                    background: 'radial-gradient(circle, var(--accent-light), transparent 70%)',
+                    y: y2,
+                    opacity: 0.1
+                }}
             />
 
             {/* Main content */}
-            <div className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6">
+            <motion.div 
+                style={{ scale, opacity }}
+                className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6"
+            >
                 {/* Status badge */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8"
+                    whileHover={{ scale: 1.05 }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8 cursor-default"
                     style={{
                         background: 'var(--success-light)',
                         border: '1px solid var(--success)',
                         color: 'var(--success)',
                     }}
                 >
-                    <div className="w-2 h-2 rounded-full" style={{ background: '#059669' }} />
+                    <motion.div 
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="w-2 h-2 rounded-full" 
+                        style={{ background: '#059669' }} 
+                    />
                     Genomic Analysis Engine Active
                 </motion.div>
 
@@ -54,13 +88,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     transition={{ duration: 0.7, delay: 0.1 }}
                     className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-4"
                 >
-                    <span style={{ color: 'var(--text-primary)' }}>
+                    <motion.span 
+                        style={{ color: 'var(--text-primary)', display: 'inline-block' }}
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    >
                         Personalized
-                    </span>
+                    </motion.span>
                     <br />
-                    <span style={{ color: 'var(--primary)' }}>
+                    <motion.span 
+                        style={{ color: 'var(--primary)', display: 'inline-block' }}
+                        animate={{ y: [0, 5, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                    >
                         Precision Medicine
-                    </span>
+                    </motion.span>
                 </motion.h1>
 
                 {/* Subtitle */}
@@ -75,8 +117,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     </p>
                     <div className="flex items-center justify-center gap-2 flex-wrap">
                         {['VCF File', '→', 'Genotype Call', '→', 'Risk Prediction', '→', 'Clinical Insight'].map((item, i) => (
-                            <span
+                            <motion.span
                                 key={i}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.5 + (i * 0.1) }}
                                 className={`text-sm font-medium px-2 py-0.5 rounded ${item === '→'
                                     ? ''
                                     : ''
@@ -88,7 +133,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                                 }}
                             >
                                 {item}
-                            </span>
+                            </motion.span>
                         ))}
                     </div>
                 </motion.div>
@@ -101,24 +146,33 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
                 >
                     <motion.button
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={onAnalyze}
                         className="relative px-8 py-4 rounded-xl font-semibold text-white text-base overflow-hidden group transition-all duration-200"
                         style={{
                             background: '#E8645A',
-                            boxShadow: '0 4px 14px rgba(232,100,90,0.25)',
+                            boxShadow: '0 4px 14px rgba(232,100,90,0.3)',
                         }}
                     >
                         <span className="relative z-10 flex items-center gap-2">
-                            <Dna size={20} />
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                            >
+                                <Dna size={20} />
+                            </motion.div>
                             Analyze Genetic Profile
                         </span>
+                        <motion.div 
+                            className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"
+                        />
                     </motion.button>
 
                     <motion.a
                         href="#about"
-                        whileHover={{ scale: 1.03 }}
+                        whileHover={{ scale: 1.05, background: 'var(--primary-light)', borderColor: 'var(--primary)' }}
+                        whileTap={{ scale: 0.98 }}
                         className="px-6 py-4 rounded-xl font-medium text-sm transition-all duration-200"
                         style={{
                             border: '1px solid var(--border)',
@@ -131,40 +185,43 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                 </motion.div>
 
                 {/* Stats */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.55 }}
-                    className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto"
-                >
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
                     {stats.map((stat, i) => (
-                        <motion.div
-                            key={stat.label}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.6 + i * 0.1 }}
-                            whileHover={{ y: -2 }}
-                            className="p-4 text-center rounded-xl transition-all duration-200"
-                            style={{
-                                background: 'var(--bg-surface)',
-                                border: '1px solid var(--border)',
-                                boxShadow: 'var(--shadow-sm)',
-                            }}
-                        >
-                            <div className="flex justify-center mb-2" style={{ color: 'var(--primary)' }}>{stat.icon}</div>
-                            <div className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{stat.value}</div>
-                            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{stat.label}</div>
-                        </motion.div>
+                        <TiltCard key={stat.label} tiltMax={15}>
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ delay: 0.6 + i * 0.1 }}
+                                className="p-4 text-center rounded-xl transition-all duration-200 h-full"
+                                style={{
+                                    background: 'var(--bg-surface)',
+                                    border: '1px solid var(--border)',
+                                    boxShadow: 'var(--shadow-sm)',
+                                    backdropFilter: 'var(--backdrop)',
+                                }}
+                            >
+                                <motion.div 
+                                    className="flex justify-center mb-2" 
+                                    style={{ color: 'var(--primary)' }}
+                                    whileHover={{ scale: 1.2, rotate: 10 }}
+                                >
+                                    {stat.icon}
+                                </motion.div>
+                                <div className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{stat.value}</div>
+                                <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{stat.label}</div>
+                            </motion.div>
+                        </TiltCard>
                     ))}
-                </motion.div>
-            </div>
+                </div>
+            </motion.div>
 
             {/* Scroll indicator */}
             <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+                className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
                 style={{ color: 'var(--text-muted)' }}
+                onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
             >
                 <ChevronDown size={24} />
             </motion.div>

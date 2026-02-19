@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import HeroSection from './HeroSection';
 import VCFUpload from './VCFUpload';
 import DrugInput from './DrugInput';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SupportedDrug } from '../utils/mockData';
+import TiltCard from '../components/TiltCard';
+
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [selectedDrugs, setSelectedDrugs] = useState<SupportedDrug[]>([]);
+
+    const { scrollYProgress } = useScroll();
+    const scaleX = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
 
     const handleAnalyze = (drugs: SupportedDrug[]) => {
         setSelectedDrugs(drugs);
@@ -39,6 +48,12 @@ const LandingPage: React.FC = () => {
 
     return (
         <>
+            {/* Scroll Progress Bar */}
+            <motion.div
+                className="fixed top-0 left-0 right-0 h-1.5 bg-primary z-50 origin-left"
+                style={{ scaleX, background: 'linear-gradient(90deg, var(--primary), var(--accent))' }}
+            />
+
             <HeroSection
                 onAnalyze={() => {
                     document.getElementById('upload')?.scrollIntoView({ behavior: 'smooth' });
@@ -46,99 +61,140 @@ const LandingPage: React.FC = () => {
             />
 
             {/* VCF Upload section */}
-            <div className="relative" style={{ background: 'var(--bg-muted)', backdropFilter: 'var(--backdrop)', WebkitBackdropFilter: 'var(--backdrop)' }}>
+            <motion.div 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8 }}
+                className="relative" 
+                style={{ background: 'var(--bg-muted)', backdropFilter: 'var(--backdrop)', WebkitBackdropFilter: 'var(--backdrop)' }}
+            >
                 <VCFUpload onFileAccepted={(file) => setUploadedFile(file)} />
-            </div>
+            </motion.div>
 
             {/* Drug Input section */}
-            <div className="relative" style={{ background: 'var(--bg-surface)', backdropFilter: 'var(--backdrop)', WebkitBackdropFilter: 'var(--backdrop)' }}>
+            <motion.div 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8 }}
+                className="relative" 
+                style={{ background: 'var(--bg-surface)', backdropFilter: 'var(--backdrop)', WebkitBackdropFilter: 'var(--backdrop)' }}
+            >
                 <DrugInput
                     onDrugsSelected={setSelectedDrugs}
                     onAnalyze={handleAnalyze}
                     hasFile={!!uploadedFile}
                 />
-            </div>
+            </motion.div>
 
             {/* About / How it Works */}
-            <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <section id="about" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-12"
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="text-center mb-16"
                 >
-                    <h2 className="text-4xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>How PharmaGuard Works</h2>
-                    <p style={{ color: 'var(--text-secondary)' }} className="max-w-2xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-black mb-4" style={{ color: 'var(--text-primary)' }}>How PharmaGuard Works</h2>
+                    <div className="w-24 h-1 bg-primary mx-auto mb-6 rounded-full" />
+                    <p style={{ color: 'var(--text-secondary)' }} className="max-w-2xl mx-auto text-lg">
                         Leveraging CPIC guidelines and AI to deliver personalized drug safety insights based on your unique genetic profile.
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[
                         { step: '01', title: 'Upload VCF', desc: 'Upload your Variant Call Format file from whole-genome or targeted pharmacogene sequencing.', icon: '🧬', color: '#0D7377' },
                         { step: '02', title: 'Genotype Analysis', desc: 'Our AI engine calls diplotypes for 450+ pharmacogenes using CPIC star allele nomenclature.', icon: '⚗️', color: '#E8645A' },
                         { step: '03', title: 'Clinical Report', desc: 'Receive CPIC-aligned drug risk predictions with clinical recommendations for each medication.', icon: '📋', color: '#059669' },
                     ].map((item, i) => (
-                        <motion.div
-                            key={item.step}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: i * 0.15 }}
-                            whileHover={{ y: -4 }}
-                            className="p-6 rounded-2xl text-center transition-all duration-200"
-                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
-                        >
-                            <div className="text-4xl mb-4">{item.icon}</div>
-                            <div className="text-xs font-mono mb-2 font-bold" style={{ color: item.color }}>STEP {item.step}</div>
-                            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
-                            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
-                        </motion.div>
+                        <TiltCard key={item.step} tiltMax={10}>
+                            <motion.div
+                                initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: i * 0.2 }}
+                                className="p-8 rounded-3xl text-center h-full flex flex-col items-center group"
+                                style={{ 
+                                    background: 'var(--bg-surface)', 
+                                    border: '1px solid var(--border)', 
+                                    boxShadow: 'var(--shadow-sm)',
+                                    backdropFilter: 'var(--backdrop)'
+                                }}
+                            >
+                                <motion.div 
+                                    whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+                                    className="text-5xl mb-6 bg-white/50 w-20 h-20 rounded-2xl flex items-center justify-center shadow-inner"
+                                >
+                                    {item.icon}
+                                </motion.div>
+                                <div className="text-sm font-mono mb-3 font-black tracking-widest" style={{ color: item.color }}>STEP {item.step}</div>
+                                <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
+                                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
+                            </motion.div>
+                        </TiltCard>
                     ))}
                 </div>
 
                 {/* Error handling */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="mt-10"
+                    transition={{ duration: 0.7, delay: 0.3 }}
+                    className="mt-20"
                 >
-                    <h3 className="text-lg font-bold mb-4 text-center" style={{ color: 'var(--text-primary)' }}>Error Handling</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <h3 className="text-2xl font-bold mb-8 text-center" style={{ color: 'var(--text-primary)' }}>Resilient Analysis Engine</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
                             { type: 'Invalid VCF Format', desc: 'File doesn\'t conform to VCF 4.1/4.2 standard.', solution: 'System validates ##fileformat header and CHROM structure.', bgVar: 'var(--danger-light)', borderVar: 'var(--danger)', colorVar: 'var(--danger)' },
                             { type: 'Missing Gene Annotations', desc: 'VCF lacks pharmacogene annotations.', solution: 'Provides partial analysis with confidence degradation.', bgVar: 'var(--warning-light)', borderVar: 'var(--warning)', colorVar: 'var(--warning)' },
                             { type: 'Unsupported Drug', desc: 'Drug not in CPIC database.', solution: 'Returns "Unknown" label with PharmGKB link.', bgVar: 'var(--info-light)', borderVar: 'var(--info)', colorVar: 'var(--info)' },
                             { type: 'Network/API Error', desc: 'Analysis service unavailable.', solution: 'Fallback to cached CPIC guidelines with offline indicator.', bgVar: 'var(--bg-muted)', borderVar: 'var(--border)', colorVar: 'var(--text-secondary)' },
-                        ].map((err) => (
-                            <div key={err.type} className="p-4 rounded-xl text-xs" style={{ background: err.bgVar, border: `1px solid ${err.borderVar}` }}>
-                                <p className="font-semibold mb-1" style={{ color: err.colorVar }}>{err.type}</p>
-                                <p className="mb-2 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{err.desc}</p>
-                                <p className="leading-relaxed" style={{ color: 'var(--text-primary)' }}>{err.solution}</p>
-                            </div>
+                        ].map((err, i) => (
+                            <motion.div 
+                                key={err.type} 
+                                whileHover={{ scale: 1.02, y: -5 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                                className="p-6 rounded-2xl text-xs relative overflow-hidden group" 
+                                style={{ background: err.bgVar, border: `1px solid ${err.borderVar}` }}
+                            >
+                                <p className="font-bold text-sm mb-2" style={{ color: err.colorVar }}>{err.type}</p>
+                                <p className="mb-3 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{err.desc}</p>
+                                <p className="leading-relaxed font-medium" style={{ color: 'var(--text-primary)' }}>{err.solution}</p>
+                                <motion.div 
+                                    className="absolute -right-2 -bottom-2 opacity-10 group-hover:scale-150 transition-transform duration-500"
+                                    style={{ color: err.colorVar }}
+                                >
+                                    <div className="text-4xl">⚠</div>
+                                </motion.div>
+                            </motion.div>
                         ))}
                     </div>
                 </motion.div>
             </section>
 
-            <section id="docs" className="pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <section id="docs" className="pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                 <motion.div
-                    initial={{ opacity: 0, y: 24 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center mb-10"
+                    transition={{ duration: 0.6 }}
+                    className="text-center mb-16"
                 >
-                    <h2 className="text-4xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>Documentation</h2>
-                    <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                    <h2 className="text-4xl font-black mb-4" style={{ color: 'var(--text-primary)' }}>Documentation</h2>
+                    <div className="w-16 h-1 bg-accent mx-auto mb-6 rounded-full" />
+                    <p className="max-w-2xl mx-auto text-lg" style={{ color: 'var(--text-secondary)' }}>
                         Implementation references, input formats, and interpretation guides for the PharmaGuard workflow.
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[
                         {
                             title: 'VCF Requirements',
@@ -159,24 +215,29 @@ const LandingPage: React.FC = () => {
                             color: 'var(--success)',
                         },
                     ].map((doc, i) => (
-                        <motion.article
-                            key={doc.title}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.45, delay: i * 0.1 }}
-                            whileHover={{ y: -4 }}
-                            className="p-6 rounded-2xl"
-                            style={{
-                                background: 'var(--bg-surface)',
-                                border: '1px solid var(--border)',
-                                boxShadow: 'var(--shadow-sm)',
-                            }}
-                        >
-                            <p className="text-[10px] font-bold tracking-wider mb-2" style={{ color: doc.color }}>{doc.tag}</p>
-                            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{doc.title}</h3>
-                            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{doc.desc}</p>
-                        </motion.article>
+                        <TiltCard key={doc.title} tiltMax={12}>
+                            <motion.article
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: i * 0.15 }}
+                                className="p-8 rounded-3xl h-full flex flex-col group cursor-pointer"
+                                style={{
+                                    background: 'var(--bg-surface)',
+                                    border: '1px solid var(--border)',
+                                    boxShadow: 'var(--shadow-sm)',
+                                    backdropFilter: 'var(--backdrop)'
+                                }}
+                            >
+                                <p className="text-[11px] font-black uppercase tracking-widest mb-4 inline-block px-3 py-1 rounded-full w-fit" 
+                                   style={{ color: doc.color, background: `${doc.color}15` }}>{doc.tag}</p>
+                                <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>{doc.title}</h3>
+                                <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>{doc.desc}</p>
+                                <div className="mt-auto flex items-center gap-2 font-bold text-xs" style={{ color: doc.color }}>
+                                    READ MORE <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                </div>
+                            </motion.article>
+                        </TiltCard>
                     ))}
                 </div>
             </section>

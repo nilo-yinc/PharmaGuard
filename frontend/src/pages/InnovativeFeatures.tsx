@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Brain, ArrowRight, Dna, Info, Lock, Eye, EyeOff, Users } from 'lucide-react';
 import { GENOMIC_TIMELINE_STEPS, MOCK_GENES, Gene, MOCK_ANALYSIS_RESULT, RISK_COLORS } from '../utils/mockData';
 import GeneModal from './GeneModal';
+import TiltCard from '../components/TiltCard';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -122,37 +123,41 @@ export const GenomicTimeline: React.FC = () => {
                                 onMouseEnter={() => setHoveredStep(step.step)}
                                 onMouseLeave={() => setHoveredStep(null)}
                             >
-                                <motion.div
-                                    initial={{ opacity: 0, y: 15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.1 }}
-                                    whileHover={{ y: -4 }}
-                                >
-                                    {/* Icon */}
+                                <TiltCard tiltMax={12}>
                                     <motion.div
-                                        className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl relative z-10"
-                                        style={{
-                                            background: `${step.color}08`,
-                                            border: `2px solid ${hoveredStep === step.step ? step.color + '60' : step.color + '25'}`,
-                                        }}
+                                        initial={{ opacity: 0, y: 15 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: i * 0.1 }}
                                     >
-                                        {step.icon}
-                                    </motion.div>
+                                        {/* Icon */}
+                                        <motion.div
+                                            className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl relative z-10"
+                                            style={{
+                                                background: `${step.color}08`,
+                                                border: `2px solid ${hoveredStep === step.step ? step.color + '60' : step.color + '25'}`,
+                                            }}
+                                            whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+                                        >
+                                            {step.icon}
+                                        </motion.div>
 
-                                    {/* Info card */}
-                                    <div
-                                        className="w-full px-2.5 py-2.5 rounded-xl text-center transition-all duration-200"
-                                        style={{
-                                            background: hoveredStep === step.step ? `${step.color}08` : 'var(--bg-muted)',
-                                            border: `1px solid ${hoveredStep === step.step ? step.color + '30' : 'var(--border)'}`,
-                                        }}
-                                    >
-                                        <p className="text-[9px] font-bold mb-0.5 uppercase tracking-wide" style={{ color: step.color }}>
-                                            Step {step.step}
-                                        </p>
-                                        <p className="text-xs font-semibold mb-0.5 leading-tight" style={{ color: 'var(--text-primary)' }}>{step.label}</p>
-                                        <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{step.description}</p>
-                                    </div>
+                                        {/* Info card */}
+                                        <div
+                                            className="w-full px-2.5 py-2.5 rounded-xl text-center transition-all duration-200"
+                                            style={{
+                                                background: hoveredStep === step.step ? `${step.color}08` : 'var(--bg-muted)',
+                                                border: `1px solid ${hoveredStep === step.step ? step.color + '30' : 'var(--border)'}`,
+                                            }}
+                                        >
+                                            <p className="text-[9px] font-bold mb-0.5 uppercase tracking-wide" style={{ color: step.color }}>
+                                                Step {step.step}
+                                            </p>
+                                            <p className="text-xs font-semibold mb-0.5 leading-tight" style={{ color: 'var(--text-primary)' }}>{step.label}</p>
+                                            <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{step.description}</p>
+                                        </div>
+                                    </motion.div>
+                                </TiltCard>
 
                                     {/* Hover mini-explainer */}
                                     <AnimatePresence>
@@ -176,7 +181,6 @@ export const GenomicTimeline: React.FC = () => {
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
-                                </motion.div>
                             </div>
                         ))}
                     </div>
@@ -269,24 +273,31 @@ export const ComplianceBadges: React.FC = () => {
         >
             <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>Audit & Compliance Certificates</h3>
             <p className="text-[10px] mb-5" style={{ color: 'var(--text-muted)' }}>All standards verified for clinical research use</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {badges.map((badge, i) => (
-                    <motion.div
-                        key={badge.label}
-                        initial={{ opacity: 0, scale: 0.88 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                        whileHover={{ scale: 1.04, y: -2 }}
-                        className="p-4 rounded-2xl text-xs cursor-default transition-all duration-200"
-                        style={{
-                            background: `${badge.color}06`,
-                            border: `1px solid ${badge.color}18`,
-                        }}
-                    >
-                        <div className="text-2xl mb-2">{badge.icon}</div>
-                        <p className="font-semibold mb-1 leading-tight" style={{ color: badge.color }}>{badge.label}</p>
-                        <p className="text-[9px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{badge.desc}</p>
-                    </motion.div>
+                    <TiltCard key={badge.label} tiltMax={10}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.88 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.05 }}
+                            className="p-4 rounded-2xl text-xs cursor-default h-full transition-all duration-300"
+                            style={{
+                                background: `${badge.color}06`,
+                                border: `1px solid ${badge.color}18`,
+                                backdropFilter: 'var(--backdrop)'
+                            }}
+                        >
+                            <motion.div 
+                                className="text-2xl mb-2"
+                                whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
+                            >
+                                {badge.icon}
+                            </motion.div>
+                            <p className="font-bold mb-1 leading-tight" style={{ color: badge.color }}>{badge.label}</p>
+                            <p className="text-[9px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{badge.desc}</p>
+                        </motion.div>
+                    </TiltCard>
                 ))}
             </div>
         </motion.div>

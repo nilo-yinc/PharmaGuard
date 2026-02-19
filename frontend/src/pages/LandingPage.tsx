@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import HeroSection from './HeroSection';
 import VCFUpload from './VCFUpload';
 import DrugInput from './DrugInput';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SupportedDrug } from '../utils/mockData';
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [selectedDrugs, setSelectedDrugs] = useState<SupportedDrug[]>([]);
 
@@ -14,6 +15,27 @@ const LandingPage: React.FC = () => {
         setSelectedDrugs(drugs);
         navigate('/analyze');
     };
+
+    useEffect(() => {
+        const sectionParam = new URLSearchParams(location.search).get('section');
+        const hashSection = location.hash.replace('#', '');
+        const targetId = sectionParam || hashSection;
+
+        if (!targetId) return;
+
+        const scrollToTarget = (attempt = 0) => {
+            const el = document.getElementById(targetId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+            if (attempt < 6) {
+                window.setTimeout(() => scrollToTarget(attempt + 1), 100);
+            }
+        };
+
+        scrollToTarget();
+    }, [location.pathname, location.search, location.hash]);
 
     return (
         <>
@@ -100,6 +122,64 @@ const LandingPage: React.FC = () => {
                         ))}
                     </div>
                 </motion.div>
+            </section>
+
+            <section id="docs" className="pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="text-center mb-10"
+                >
+                    <h2 className="text-4xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>Documentation</h2>
+                    <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                        Implementation references, input formats, and interpretation guides for the PharmaGuard workflow.
+                    </p>
+                </motion.div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                        {
+                            title: 'VCF Requirements',
+                            desc: 'Accepted schema versions, required headers, supported pharmacogene fields, and common validation failures.',
+                            tag: 'Input Spec',
+                            color: 'var(--primary)',
+                        },
+                        {
+                            title: 'Drug Evidence Mapping',
+                            desc: 'How CPIC/PharmGKB evidence is mapped to risk categories, confidence scoring, and recommendation generation.',
+                            tag: 'Clinical Logic',
+                            color: 'var(--accent)',
+                        },
+                        {
+                            title: 'Report Interpretation',
+                            desc: 'How to read phenotype summaries, gene-drug interactions, and confidence indicators in generated reports.',
+                            tag: 'User Guide',
+                            color: 'var(--success)',
+                        },
+                    ].map((doc, i) => (
+                        <motion.article
+                            key={doc.title}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.45, delay: i * 0.1 }}
+                            whileHover={{ y: -6, rotateX: 7, rotateY: i % 2 === 0 ? -6 : 6 }}
+                            className="p-6 rounded-2xl"
+                            style={{
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                boxShadow: 'var(--shadow-sm)',
+                                transformStyle: 'preserve-3d',
+                            }}
+                        >
+                            <p className="text-[10px] font-bold tracking-wider mb-2" style={{ color: doc.color }}>{doc.tag}</p>
+                            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{doc.title}</h3>
+                            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{doc.desc}</p>
+                        </motion.article>
+                    ))}
+                </div>
             </section>
         </>
     );

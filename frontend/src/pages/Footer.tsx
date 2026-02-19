@@ -10,9 +10,9 @@ const Footer: React.FC = () => {
         {
             title: 'PharmaGuard',
             links: [
-                { label: 'About', to: '/#about' },
-                { label: 'How It Works', to: '/#about' },
-                { label: 'Start Analysis', to: '/analyze' },
+                { label: 'About', to: '/?section=about' },
+                { label: 'How It Works', to: '/?section=about' },
+                { label: 'Start Analysis', to: '/analyze?step=1' },
             ],
         },
         {
@@ -34,9 +34,9 @@ const Footer: React.FC = () => {
         {
             title: 'Resources',
             links: [
-                { label: 'Documentation', to: '#' },
-                { label: 'API Reference', to: '#' },
-                { label: 'Contact Support', to: '#' },
+                { label: 'Documentation', to: '/?section=docs' },
+                { label: 'API Reference', to: '/?section=docs' },
+                { label: 'Contact Support', to: '/?section=docs' },
             ],
         },
     ];

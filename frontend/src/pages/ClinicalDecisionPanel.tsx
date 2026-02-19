@@ -112,7 +112,7 @@ const ClinicalDecisionPanel: React.FC = () => {
                     >
                         <div className="flex justify-center mb-1" style={{ color: item.color }}>{item.icon}</div>
                         <p className="text-xl font-black" style={{ color: item.color }}>{item.count}</p>
-                        <p className="text-[9px]" style={{ color: '#9CA3AF' }}>{item.label}</p>
+                        <p className="text-[9px]" style={{ color: 'var(--text-secondary)' }}>{item.label}</p>
                     </motion.div>
                 ))}
             </div>
@@ -134,8 +134,8 @@ const ClinicalDecisionPanel: React.FC = () => {
                             className="rounded-xl overflow-hidden"
                             style={{
                                 border: `1px solid ${rc}20`,
-                                background: 'white',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                                background: 'var(--bg-surface)',
+                                boxShadow: 'var(--shadow-sm)',
                             }}
                         >
                             <button
@@ -150,15 +150,15 @@ const ClinicalDecisionPanel: React.FC = () => {
                                     <Pill size={13} style={{ color: rc }} />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold" style={{ color: '#1F2937' }}>{drug.drug}</p>
-                                    <p className="text-[10px] truncate" style={{ color: '#9CA3AF' }}>{drug.variants[0]?.gene} · {drug.variants[0]?.phenotype}</p>
+                                    <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{drug.drug}</p>
+                                    <p className="text-[10px] truncate" style={{ color: 'var(--text-secondary)' }}>{drug.variants[0]?.gene} · {drug.variants[0]?.phenotype}</p>
                                 </div>
                                 <span className="px-2 py-0.5 rounded text-[10px] font-semibold flex-shrink-0"
                                     style={{ background: `${rc}10`, color: rc, border: `1px solid ${rc}25` }}>
                                     {drug.riskLevel.toUpperCase()}
                                 </span>
                                 <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
-                                    <ChevronRight size={13} style={{ color: '#9CA3AF' }} />
+                                    <ChevronRight size={13} style={{ color: 'var(--text-secondary)' }} />
                                 </motion.div>
                             </button>
 
@@ -171,26 +171,26 @@ const ClinicalDecisionPanel: React.FC = () => {
                                         transition={{ duration: 0.3 }}
                                         style={{ borderTop: `1px solid ${rc}12` }}
                                     >
-                                        <div className="p-4 space-y-3" style={{ background: '#F9FAFB' }}>
+                                        <div className="p-4 space-y-3" style={{ background: 'var(--bg-muted)' }}>
                                             {dosage && (
                                                 <div>
-                                                    <p className="text-[9px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1" style={{ color: '#9CA3AF' }}>
+                                                    <p className="text-[9px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1" style={{ color: 'var(--text-secondary)' }}>
                                                         <Info size={9} /> Dosage Guidance
                                                     </p>
-                                                    <p className="text-xs leading-relaxed mb-2" style={{ color: '#4B5563' }}>{dosage.guidance}</p>
-                                                    <p className="text-[9px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1" style={{ color: '#9CA3AF' }}>
+                                                    <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--text-primary)' }}>{dosage.guidance}</p>
+                                                    <p className="text-[9px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1" style={{ color: 'var(--text-secondary)' }}>
                                                         <Clock size={9} /> Monitoring
                                                     </p>
                                                     {dosage.monitoring.map(m => (
-                                                        <p key={m} className="text-[10px] flex items-start gap-1.5" style={{ color: '#6B7280' }}>
-                                                            <span className="mt-0.5" style={{ color: '#D1D5DB' }}>•</span>{m}
+                                                        <p key={m} className="text-[10px] flex items-start gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+                                                            <span className="mt-0.5" style={{ color: 'var(--text-muted)' }}>•</span>{m}
                                                         </p>
                                                     ))}
                                                 </div>
                                             )}
                                             {alts.length > 0 && (
                                                 <div>
-                                                    <p className="text-[9px] font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-1" style={{ color: '#9CA3AF' }}>
+                                                    <p className="text-[9px] font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-1" style={{ color: 'var(--text-secondary)' }}>
                                                         <Shield size={9} /> Alternatives
                                                     </p>
                                                     <div className="space-y-1.5">
@@ -199,8 +199,8 @@ const ClinicalDecisionPanel: React.FC = () => {
                                                                 style={{ background: `${RISK_COLORS[alt.riskLevel]}06`, border: `1px solid ${RISK_COLORS[alt.riskLevel]}15` }}>
                                                                 <span className="text-[10px] font-bold" style={{ color: RISK_COLORS[alt.riskLevel] }}>✓</span>
                                                                 <div>
-                                                                    <p className="text-xs font-semibold" style={{ color: '#1F2937' }}>{alt.drug}</p>
-                                                                    <p className="text-[10px]" style={{ color: '#9CA3AF' }}>{alt.reason}</p>
+                                                                    <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{alt.drug}</p>
+                                                                    <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{alt.reason}</p>
                                                                 </div>
                                                             </div>
                                                         ))}

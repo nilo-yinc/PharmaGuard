@@ -90,10 +90,10 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
     };
 
     const getBgColor = () => {
-        if (isDragReject || fileError) return '#FEF2F2';
-        if (isDragActive) return '#E6F5F5';
-        if (isSuccess) return '#ECFDF5';
-        return '#FAFBFC';
+        if (isDragReject || fileError) return 'var(--danger-light)';
+        if (isDragActive) return 'var(--primary-light)';
+        if (isSuccess) return 'var(--success-light)';
+        return 'var(--bg-muted)';
     };
 
     return (
@@ -112,8 +112,8 @@ const VCFUpload: React.FC<VCFUploadProps> = ({ onFileAccepted }) => {
                     <Upload size={12} />
                     Step 1 of 2
                 </div>
-                <h2 className="text-4xl font-black mb-3" style={{ color: '#1F2937' }}>Upload VCF File</h2>
-                <p style={{ color: '#6B7280' }} className="max-w-xl mx-auto">
+                <h2 className="text-4xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>Upload VCF File</h2>
+                <p style={{ color: 'var(--text-secondary)' }} className="max-w-xl mx-auto">
                     Upload your Variant Call Format (VCF) file to begin pharmacogenomic analysis.
                     Supports VCF v4.1 and v4.2 standards.
                 </p>

@@ -1,201 +1,240 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
-    Sun, Moon, Menu, X, Shield, Activity,
-    ChevronRight, Dna, FlaskConical
+    Menu, X, Sun, Moon, LogIn, LogOut, User,
+    Upload, Pill, LayoutDashboard, Info, FileText,
+    ChevronDown, Settings, History, Shield
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
-interface NavbarProps {
-    onNavigate?: (section: string) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
+const Navbar: React.FC = () => {
     const { isDark, toggleTheme } = useTheme();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { user, isAuthenticated, logout } = useAuth();
+    const navigate = useNavigate();
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
 
     const navLinks = [
-        { label: 'Upload VCF', href: '#upload', icon: <Dna size={14} /> },
-        { label: 'Drug Input', href: '#drugs', icon: <FlaskConical size={14} /> },
-        { label: 'Dashboard', href: '#dashboard', icon: <Activity size={14} /> },
-        { label: 'About', href: '#about', icon: <Shield size={14} /> },
+        { to: '/analyze', label: 'Upload VCF', icon: <Upload size={14} /> },
+        { to: '/analyze', label: 'Drug Input', icon: <Pill size={14} /> },
+        { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} /> },
+        { to: '/#about', label: 'About', icon: <Info size={14} /> },
+        { to: '#', label: 'Docs', icon: <FileText size={14} /> },
     ];
 
+    const handleLogout = () => {
+        logout();
+        setDropdownOpen(false);
+        navigate('/');
+    };
+
+    const navLinkStyle = (isActive: boolean) => ({
+        color: isActive ? '#0D7377' : '#6B7280',
+        fontWeight: isActive ? 600 : 500,
+    });
+
     return (
-        <motion.nav
-            initial={{ y: -80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="fixed top-0 left-0 right-0 z-40"
+        <nav
+            className="sticky top-0 z-50 backdrop-blur-md"
             style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                borderBottom: '1px solid #E5E7EB',
+                background: 'var(--bg-surface)',
+                borderBottom: '1px solid var(--border)',
             }}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    {/* Logo */}
-                    <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="flex items-center gap-3 cursor-pointer"
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    >
-                        {/* Shield Logo */}
-                        <div className="relative w-8 h-8">
-                            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M16 2L4 8v8c0 6.627 5.373 12 12 12s12-5.373 12-12V8L16 2z"
-                                    fill="#E6F5F5"
-                                    stroke="#0D7377"
-                                    strokeWidth="1.5"
-                                />
-                                <path d="M12 10 Q16 13 20 10 Q16 7 12 10"
-                                    stroke="#0D7377" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                                <path d="M12 16 Q16 19 20 16 Q16 13 12 16"
-                                    stroke="#E8645A" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                                <path d="M12 22 Q16 25 20 22 Q16 19 12 22"
-                                    stroke="#0D7377" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                                <line x1="12" y1="10" x2="12" y2="22" stroke="rgba(13,115,119,0.3)" strokeWidth="1" />
-                                <line x1="20" y1="10" x2="20" y2="22" stroke="rgba(232,100,90,0.3)" strokeWidth="1" />
-                            </svg>
+                    {/* Left — Logo */}
+                    <Link to="/" className="flex items-center gap-2.5 group">
+                        <div
+                            className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm transition-transform group-hover:scale-105"
+                            style={{ background: 'linear-gradient(135deg, #0D7377, #0A5C5F)' }}
+                        >
+                            PG
                         </div>
-
                         <div>
-                            <span className="text-lg font-black tracking-tight" style={{ color: '#0D7377' }}>
-                                PharmaGuard
-                            </span>
-                            <span className="hidden sm:block text-[9px] tracking-widest uppercase -mt-1"
-                                style={{ color: '#9CA3AF' }}
-                            >
-                                Pharmacogenomics AI
-                            </span>
+                            <p className="font-bold text-sm leading-none" style={{ color: 'var(--text-primary)' }}>PharmaGuard</p>
+                            <p className="text-[9px] leading-tight" style={{ color: 'var(--text-secondary)' }}>Pharmacogenomics AI</p>
                         </div>
-                    </motion.div>
+                    </Link>
 
-                    {/* Desktop Nav Links */}
+                    {/* Center — Nav Links (desktop) */}
                     <div className="hidden md:flex items-center gap-1">
                         {navLinks.map((link) => (
-                            <a
+                            <NavLink
                                 key={link.label}
-                                href={link.href}
-                                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                                style={{ color: '#6B7280' }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = '#0D7377';
-                                    e.currentTarget.style.background = '#F3F4F6';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = '#6B7280';
-                                    e.currentTarget.style.background = 'transparent';
-                                }}
+                                to={link.to}
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 hover:opacity-80"
+                                style={({ isActive }) => ({
+                                    color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
+                                    fontWeight: isActive ? 600 : 500,
+                                    background: isActive ? 'var(--bg-muted)' : 'transparent'
+                                })}
                             >
                                 {link.icon}
                                 {link.label}
-                            </a>
+                            </NavLink>
                         ))}
                     </div>
 
-                    {/* Right side controls */}
-                    <div className="flex items-center gap-3">
-                        {/* CPIC Compliance badge */}
-                        <div
-                            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
-                            style={{
-                                border: '1px solid #D1FAE5',
-                                background: '#ECFDF5',
-                                color: '#059669',
-                            }}
-                        >
-                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#059669' }} />
+                    {/* Right — Actions */}
+                    <div className="flex items-center gap-2">
+                        {/* CPIC Badge */}
+                        <div className="hidden lg:flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium"
+                            style={{ background: '#ECFDF5', border: '1px solid #D1FAE5', color: '#059669' }}>
+                            <Shield size={10} />
                             CPIC Aligned
                         </div>
 
                         {/* Theme Toggle */}
                         <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={toggleTheme}
-                            className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200"
-                            style={{
-                                background: '#F3F4F6',
-                                border: '1px solid #E5E7EB',
-                                color: '#6B7280',
-                            }}
-                            aria-label="Toggle theme"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                            style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}
                         >
-                            <AnimatePresence mode="wait">
-                                {isDark ? (
-                                    <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                        <Sun size={16} />
-                                    </motion.div>
-                                ) : (
-                                    <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                        <Moon size={16} />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            {isDark ? <Sun size={15} /> : <Moon size={15} />}
                         </motion.button>
 
+                        {/* Auth section */}
+                        {isAuthenticated ? (
+                            <div className="relative" ref={dropdownRef}>
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all duration-200"
+                                    style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}
+                                >
+                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                                        style={{ background: '#0D7377' }}>
+                                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                                    </div>
+                                    <span className="hidden sm:block text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
+                                        {user?.name?.split(' ')[0] || 'User'}
+                                    </span>
+                                    <ChevronDown size={12} style={{ color: 'var(--text-secondary)' }} />
+                                </motion.button>
+
+                                <AnimatePresence>
+                                    {dropdownOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute right-0 mt-2 w-56 rounded-xl overflow-hidden"
+                                            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)' }}
+                                        >
+                                            {/* User info */}
+                                            <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                                                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{user?.name}</p>
+                                                <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{user?.email}</p>
+                                            </div>
+
+                                            {/* Menu Items */}
+                                            <div className="py-1">
+                                                {[
+                                                    { label: 'Profile', icon: <User size={13} />, to: '/profile' },
+                                                    { label: 'Analysis History', icon: <History size={13} />, to: '/dashboard' },
+                                                    { label: 'Settings', icon: <Settings size={13} />, to: '/profile' },
+                                                ].map((item) => (
+                                                    <Link
+                                                        key={item.label}
+                                                        to={item.to}
+                                                        onClick={() => setDropdownOpen(false)}
+                                                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs transition-colors hover:opacity-80"
+                                                        style={{ color: 'var(--text-secondary)' }}
+                                                    >
+                                                        {item.icon}
+                                                        {item.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+
+                                            {/* Logout */}
+                                            <div style={{ borderTop: '1px solid #F3F4F6' }}>
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="flex items-center gap-2.5 w-full px-4 py-2.5 text-xs transition-colors hover:bg-red-50"
+                                                    style={{ color: '#DC2626' }}
+                                                >
+                                                    <LogOut size={13} />
+                                                    Sign Out
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ) : (
+                            <Link to="/login">
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white"
+                                    style={{ background: '#0D7377' }}
+                                >
+                                    <LogIn size={14} />
+                                    Sign In
+                                </motion.button>
+                            </Link>
+                        )}
+
                         {/* Mobile menu button */}
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center"
-                            style={{
-                                background: '#F3F4F6',
-                                border: '1px solid #E5E7EB',
-                                color: '#6B7280',
-                            }}
+                        <button
+                            onClick={() => setMobileOpen(!mobileOpen)}
+                            className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center"
+                            style={{ color: '#6B7280' }}
                         >
-                            {isMenuOpen ? <X size={16} /> : <Menu size={16} />}
-                        </motion.button>
+                            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Mobile menu */}
             <AnimatePresence>
-                {isMenuOpen && (
+                {mobileOpen && (
                     <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
                         className="md:hidden overflow-hidden"
-                        style={{
-                            background: 'rgba(255,255,255,0.98)',
-                            borderTop: '1px solid #E5E7EB',
-                        }}
+                        style={{ background: 'white', borderTop: '1px solid #F3F4F6' }}
                     >
                         <div className="px-4 py-3 space-y-1">
-                            {navLinks.map((link, i) => (
-                                <motion.a
+                            {navLinks.map((link) => (
+                                <NavLink
                                     key={link.label}
-                                    href={link.href}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: i * 0.05 }}
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="flex items-center justify-between px-4 py-3 rounded-xl text-sm"
-                                    style={{
-                                        color: '#1F2937',
-                                        background: '#F9FAFB',
-                                        border: '1px solid #F3F4F6',
-                                    }}
+                                    to={link.to}
+                                    onClick={() => setMobileOpen(false)}
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors"
+                                    style={({ isActive }) => navLinkStyle(isActive)}
                                 >
-                                    <span className="flex items-center gap-2">
-                                        {link.icon}
-                                        {link.label}
-                                    </span>
-                                    <ChevronRight size={14} style={{ color: '#9CA3AF' }} />
-                                </motion.a>
+                                    {link.icon}
+                                    {link.label}
+                                </NavLink>
                             ))}
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.nav>
+        </nav >
     );
 };
 

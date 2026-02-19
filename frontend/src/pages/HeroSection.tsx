@@ -18,16 +18,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
         <section
             id="hero"
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
-            style={{ background: 'linear-gradient(180deg, #FAFBFC 0%, #F3F4F6 100%)' }}
+            style={{ background: 'linear-gradient(180deg, var(--bg-main) 0%, var(--bg-muted) 100%)' }}
         >
             {/* Subtle decorative circles */}
             <div
-                className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-30"
-                style={{ background: 'radial-gradient(circle, #E6F5F5, transparent 70%)' }}
+                className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-20"
+                style={{ background: 'radial-gradient(circle, var(--primary-light), transparent 70%)' }}
             />
             <div
-                className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-20"
-                style={{ background: 'radial-gradient(circle, #FEF0EF, transparent 70%)' }}
+                className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-10"
+                style={{ background: 'radial-gradient(circle, var(--accent-light), transparent 70%)' }}
             />
 
             {/* Main content */}
@@ -55,11 +55,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     transition={{ duration: 0.7, delay: 0.1 }}
                     className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-4"
                 >
-                    <span style={{ color: '#1F2937' }}>
+                    <span style={{ color: 'var(--text-primary)' }}>
                         Personalized
                     </span>
                     <br />
-                    <span style={{ color: '#0D7377' }}>
+                    <span style={{ color: 'var(--primary)' }}>
                         Precision Medicine
                     </span>
                 </motion.h1>
@@ -71,7 +71,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     transition={{ duration: 0.6, delay: 0.25 }}
                     className="mb-6"
                 >
-                    <p className="text-lg mb-3" style={{ color: '#6B7280' }}>
+                    <p className="text-lg mb-3" style={{ color: 'var(--text-secondary)' }}>
                         Upload your genomic VCF file and receive real-time pharmacogenomic drug safety insights
                     </p>
                     <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -122,9 +122,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                         whileHover={{ scale: 1.03 }}
                         className="px-6 py-4 rounded-xl font-medium text-sm transition-all duration-200"
                         style={{
-                            border: '1px solid #E5E7EB',
-                            color: '#6B7280',
-                            background: 'white',
+                            border: '1px solid var(--border)',
+                            color: 'var(--text-secondary)',
+                            background: 'var(--bg-surface)',
                         }}
                     >
                         Learn About CPIC Guidelines →
@@ -147,14 +147,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                             whileHover={{ y: -2 }}
                             className="p-4 text-center rounded-xl transition-all duration-200"
                             style={{
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                                background: 'var(--bg-surface)',
+                                border: '1px solid var(--border)',
+                                boxShadow: 'var(--shadow-sm)',
                             }}
                         >
-                            <div className="flex justify-center mb-2" style={{ color: '#0D7377' }}>{stat.icon}</div>
-                            <div className="text-xl font-black" style={{ color: '#1F2937' }}>{stat.value}</div>
-                            <div className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>{stat.label}</div>
+                            <div className="flex justify-center mb-2" style={{ color: 'var(--primary)' }}>{stat.icon}</div>
+                            <div className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{stat.value}</div>
+                            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{stat.label}</div>
                         </motion.div>
                     ))}
                 </motion.div>

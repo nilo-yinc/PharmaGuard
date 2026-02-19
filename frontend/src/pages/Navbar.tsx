@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
                             <NavLink
                                 key={link.label}
                                 to={link.to}
-                                className="nav-link-3d flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 hover:opacity-95"
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 hover:opacity-95"
                                 style={({ isActive }) => ({
                                     color: isCustomActive(link.key, isActive) ? 'var(--primary)' : 'var(--text-secondary)',
                                     fontWeight: isCustomActive(link.key, isActive) ? 600 : 500,

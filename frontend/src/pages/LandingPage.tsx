@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeroSection from './HeroSection';
 import VCFUpload from './VCFUpload';
 import DrugInput from './DrugInput';
@@ -17,52 +15,6 @@ const LandingPage: React.FC = () => {
         setSelectedDrugs(drugs);
         navigate('/analyze');
     };
-
-    useEffect(() => {
-        gsap.registerPlugin(ScrollTrigger);
-
-        const ctx = gsap.context(() => {
-            const aboutTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '#about',
-                    start: 'top 74%',
-                    toggleActions: 'play none none reverse',
-                },
-                defaults: { ease: 'power3.out' },
-            });
-
-            aboutTl
-                .from('.about-title', { y: 24, opacity: 0, duration: 0.55 })
-                .from('.about-step-card', { y: 36, opacity: 0, rotateX: -10, stagger: 0.1, duration: 0.5 }, '-=0.25')
-                .from('.about-error-card', { y: 20, opacity: 0, stagger: 0.06, duration: 0.35 }, '-=0.2');
-
-            gsap.to('#about', {
-                yPercent: -3,
-                scrollTrigger: {
-                    trigger: '#about',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: true,
-                },
-            });
-
-            const docsTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '#docs',
-                    start: 'top 78%',
-                    toggleActions: 'play none none reverse',
-                },
-                defaults: { ease: 'power3.out' },
-            });
-
-            docsTl
-                .from('.docs-title', { y: 20, opacity: 0, duration: 0.5 })
-                .from('.docs-card', { y: 34, opacity: 0, rotateY: 9, stagger: 0.11, duration: 0.5 }, '-=0.2');
-
-        });
-
-        return () => ctx.revert();
-    }, []);
 
     useEffect(() => {
         const sectionParam = new URLSearchParams(location.search).get('section');
@@ -114,7 +66,7 @@ const LandingPage: React.FC = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
-                    className="about-title text-center mb-12"
+                    className="text-center mb-12"
                 >
                     <h2 className="text-4xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>How PharmaGuard Works</h2>
                     <p style={{ color: 'var(--text-secondary)' }} className="max-w-2xl mx-auto">
@@ -135,7 +87,7 @@ const LandingPage: React.FC = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: i * 0.15 }}
                             whileHover={{ y: -4 }}
-                            className="about-step-card p-6 rounded-2xl text-center transition-all duration-200"
+                            className="p-6 rounded-2xl text-center transition-all duration-200"
                             style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
                         >
                             <div className="text-4xl mb-4">{item.icon}</div>
@@ -162,7 +114,7 @@ const LandingPage: React.FC = () => {
                             { type: 'Unsupported Drug', desc: 'Drug not in CPIC database.', solution: 'Returns "Unknown" label with PharmGKB link.', bgVar: 'var(--info-light)', borderVar: 'var(--info)', colorVar: 'var(--info)' },
                             { type: 'Network/API Error', desc: 'Analysis service unavailable.', solution: 'Fallback to cached CPIC guidelines with offline indicator.', bgVar: 'var(--bg-muted)', borderVar: 'var(--border)', colorVar: 'var(--text-secondary)' },
                         ].map((err) => (
-                            <div key={err.type} className="about-error-card p-4 rounded-xl text-xs" style={{ background: err.bgVar, border: `1px solid ${err.borderVar}` }}>
+                            <div key={err.type} className="p-4 rounded-xl text-xs" style={{ background: err.bgVar, border: `1px solid ${err.borderVar}` }}>
                                 <p className="font-semibold mb-1" style={{ color: err.colorVar }}>{err.type}</p>
                                 <p className="mb-2 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{err.desc}</p>
                                 <p className="leading-relaxed" style={{ color: 'var(--text-primary)' }}>{err.solution}</p>
@@ -178,7 +130,7 @@ const LandingPage: React.FC = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
-                    className="docs-title text-center mb-10"
+                    className="text-center mb-10"
                 >
                     <h2 className="text-4xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>Documentation</h2>
                     <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
@@ -213,13 +165,12 @@ const LandingPage: React.FC = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.45, delay: i * 0.1 }}
-                            whileHover={{ y: -6, rotateX: 7, rotateY: i % 2 === 0 ? -6 : 6 }}
-                            className="docs-card p-6 rounded-2xl"
+                            whileHover={{ y: -4 }}
+                            className="p-6 rounded-2xl"
                             style={{
                                 background: 'var(--bg-surface)',
                                 border: '1px solid var(--border)',
                                 boxShadow: 'var(--shadow-sm)',
-                                transformStyle: 'preserve-3d',
                             }}
                         >
                             <p className="text-[10px] font-bold tracking-wider mb-2" style={{ color: doc.color }}>{doc.tag}</p>

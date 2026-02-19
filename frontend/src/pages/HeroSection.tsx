@@ -1,7 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronDown, Dna, Shield, Zap, Brain } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -9,65 +7,6 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
-    const sectionRef = useRef<HTMLElement>(null);
-    const orbOneRef = useRef<HTMLDivElement>(null);
-    const orbTwoRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        gsap.registerPlugin(ScrollTrigger);
-
-        const ctx = gsap.context(() => {
-            const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-            heroTl
-                .from('.hero-badge', { y: -18, opacity: 0, duration: 0.5 })
-                .from('.hero-title', { y: 28, opacity: 0, duration: 0.6 }, '-=0.2')
-                .from('.hero-subtitle', { y: 22, opacity: 0, duration: 0.5 }, '-=0.3')
-                .from('.hero-cta', { y: 20, opacity: 0, duration: 0.45 }, '-=0.2')
-                .from('.hero-stat', { y: 30, opacity: 0, stagger: 0.08, duration: 0.45 }, '-=0.15');
-
-            if (orbOneRef.current) {
-                gsap.to(orbOneRef.current, {
-                    yPercent: -20,
-                    xPercent: 6,
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top bottom',
-                        end: 'bottom top',
-                        scrub: true,
-                    },
-                });
-            }
-
-            if (orbTwoRef.current) {
-                gsap.to(orbTwoRef.current, {
-                    yPercent: 18,
-                    xPercent: -5,
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top bottom',
-                        end: 'bottom top',
-                        scrub: true,
-                    },
-                });
-            }
-
-            gsap.to('.hero-title', {
-                rotateX: 8,
-                yPercent: -10,
-                transformPerspective: 1000,
-                transformOrigin: 'center center',
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: true,
-                },
-            });
-        }, sectionRef);
-
-        return () => ctx.revert();
-    }, []);
-
     const stats = [
         { label: 'Genes Analyzed', value: '450+', icon: <Dna size={18} /> },
         { label: 'Drug Interactions', value: '12,000+', icon: <Zap size={18} /> },
@@ -78,17 +17,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
     return (
         <section
             id="hero"
-            ref={sectionRef}
             className="relative min-h-screen flex items-center justify-center overflow-hidden"
         >
             {/* Subtle decorative circles */}
             <div
-                ref={orbOneRef}
                 className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-20"
                 style={{ background: 'radial-gradient(circle, var(--primary-light), transparent 70%)' }}
             />
             <div
-                ref={orbTwoRef}
                 className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-10"
                 style={{ background: 'radial-gradient(circle, var(--accent-light), transparent 70%)' }}
             />
@@ -100,7 +36,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8"
                     style={{
                         background: 'var(--success-light)',
                         border: '1px solid var(--success)',
@@ -116,7 +52,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.7, delay: 0.1 }}
-                    className="hero-title text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-4"
+                    className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-4"
                 >
                     <span style={{ color: 'var(--text-primary)' }}>
                         Personalized
@@ -132,7 +68,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.25 }}
-                    className="hero-subtitle mb-6"
+                    className="mb-6"
                 >
                     <p className="text-lg mb-3" style={{ color: 'var(--text-secondary)' }}>
                         Upload your genomic VCF file and receive real-time pharmacogenomic drug safety insights
@@ -162,7 +98,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
-                    className="hero-cta flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+                    className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
                 >
                     <motion.button
                         whileHover={{ scale: 1.03 }}
@@ -208,7 +144,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAnalyze }) => {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.6 + i * 0.1 }}
                             whileHover={{ y: -2 }}
-                            className="hero-stat p-4 text-center rounded-xl transition-all duration-200"
+                            className="p-4 text-center rounded-xl transition-all duration-200"
                             style={{
                                 background: 'var(--bg-surface)',
                                 border: '1px solid var(--border)',

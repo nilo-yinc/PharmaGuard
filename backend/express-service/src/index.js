@@ -28,6 +28,21 @@ const allowedOrigins = (
   .filter(Boolean);
 
 const isLocalhost = (origin) => /^https?:\/\/localhost(:\d+)?$/.test(origin);
+const allowVercelPreviews = String(process.env.ALLOW_VERCEL_PREVIEWS || '').toLowerCase() === 'true';
+const vercelFrontendPrefix = (process.env.VERCEL_FRONTEND_PREFIX || '').trim().toLowerCase();
+
+const isAllowedVercelPreview = (origin) => {
+  if (!allowVercelPreviews) return false;
+  try {
+    const url = new URL(origin);
+    const host = url.hostname.toLowerCase();
+    if (!host.endsWith('.vercel.app')) return false;
+    if (!vercelFrontendPrefix) return true;
+    return host.startsWith(`${vercelFrontendPrefix}-`) || host === `${vercelFrontendPrefix}.vercel.app`;
+  } catch (_) {
+    return false;
+  }
+};
 
 // Middleware — CORS must come BEFORE helmet so preflight OPTIONS passes
 app.use(cors({
@@ -38,7 +53,7 @@ app.use(cors({
     if (process.env.NODE_ENV !== 'production' && isLocalhost(origin)) {
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin) || isAllowedVercelPreview(origin)) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));

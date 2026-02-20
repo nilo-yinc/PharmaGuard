@@ -526,3 +526,10 @@ Node.js v23.8.0
 📚 Service: PharmaGuard Express API
 ✅ MongoDB Connected: ac-ugmp4hm-shard-00-01.hotv0tn.mongodb.net
 📊 Database: test
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+🚀 Express server running on http://localhost:3000
+📚 Service: PharmaGuard Express API
+✅ MongoDB Connected: ac-ugmp4hm-shard-00-02.hotv0tn.mongodb.net
+📊 Database: test

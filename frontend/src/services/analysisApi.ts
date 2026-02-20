@@ -2,8 +2,27 @@
 // ─── PharmaGuard Analysis API Service ─────────────────────────────────────────
 // Requests to /api/v1 are proxied to Express backend (port 3000)
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const resolveApiBase = () => {
+    const configured = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+    if (configured) return configured;
+    if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+        return 'https://pharmaguard-node.vercel.app';
+    }
+    return '';
+};
+
+const API_BASE = resolveApiBase();
 const BASE_URL = API_BASE ? `${API_BASE}/api/v1` : '/api/v1';
+
+const parseResponseBody = async (response: Response) => {
+    const text = await response.text();
+    if (!text) return {};
+    try {
+        return JSON.parse(text);
+    } catch {
+        return { message: text };
+    }
+};
 
 const buildAuthHeaders = (extra: Record<string, string> = {}) => {
     const storedToken = localStorage.getItem('pg_jwt');
@@ -116,7 +135,7 @@ export const analysisApi = {
                 body: formData,
             });
 
-            const result = await response.json().catch(() => ({}));
+            const result = await parseResponseBody(response);
             if (!response.ok) {
                 const errorMessage =
                     (typeof result.error === 'string' && result.error) ||
@@ -146,9 +165,14 @@ export const analysisApi = {
                 body: JSON.stringify({ recordId, drugs }),
             });
 
-            const result = await response.json();
+            const result = await parseResponseBody(response);
             if (!response.ok) {
-                return { success: false, error: result.error || 'Analysis failed' };
+                const message =
+                    result?.error?.message ||
+                    result?.error ||
+                    result?.message ||
+                    `Analysis failed (${response.status})`;
+                return { success: false, error: message };
             }
             return { success: true, data: result.data };
 
@@ -167,10 +191,15 @@ export const analysisApi = {
                 credentials: 'include',
                 headers: buildAuthHeaders(),
             });
-            const result = await response.json();
+            const result = await parseResponseBody(response);
 
             if (!response.ok) {
-                return { success: false, error: result.error || 'Failed to fetch report' };
+                const message =
+                    result?.error?.message ||
+                    result?.error ||
+                    result?.message ||
+                    `Failed to fetch report (${response.status})`;
+                return { success: false, error: message };
             }
 
             const record = result.data;
@@ -195,9 +224,14 @@ export const analysisApi = {
                 credentials: 'include',
                 headers: buildAuthHeaders(),
             });
-            const result = await response.json();
+            const result = await parseResponseBody(response);
             if (!response.ok) {
-                return { success: false, error: result.error || 'Failed to fetch records' };
+                const message =
+                    result?.error?.message ||
+                    result?.error ||
+                    result?.message ||
+                    `Failed to fetch records (${response.status})`;
+                return { success: false, error: message };
             }
 
             const records = (result.data || []).map((record: any) => mapRecordToAnalysis(record));

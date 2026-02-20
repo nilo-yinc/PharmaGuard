@@ -2,8 +2,27 @@
 // Typed fetch wrapper for the Express auth backend at /api/v1/users/*
 // All requests include credentials (JWT cookie) automatically.
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const resolveApiBase = () => {
+    const configured = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+    if (configured) return configured;
+    if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+        return 'https://pharmaguard-node.vercel.app';
+    }
+    return '';
+};
+
+const API_BASE = resolveApiBase();
 const BASE = API_BASE ? `${API_BASE}/api/v1/users` : '/api/v1/users';
+
+const parseResponseBody = async (res: Response) => {
+    const text = await res.text();
+    if (!text) return {};
+    try {
+        return JSON.parse(text);
+    } catch {
+        return { message: text };
+    }
+};
 
 async function request<T>(
     method: string,
@@ -22,9 +41,13 @@ async function request<T>(
             headers,
             body: body ? JSON.stringify(body) : undefined,
         });
-        const json = await res.json();
+        const json = await parseResponseBody(res);
         if (!res.ok) {
-            return { ok: false, error: json.message || 'Request failed' };
+            const message = json?.message || json?.error?.message || `Request failed (${res.status})`;
+            if (res.status === 405) {
+                return { ok: false, error: 'API route not found. Check VITE_API_BASE_URL for frontend deployment.' };
+            }
+            return { ok: false, error: message };
         }
         return { ok: true, data: json };
     } catch (e: any) {

@@ -19,6 +19,7 @@ connectDB();
 const app = express();
 
 const allowedOrigins = (
+  process.env.FRONTEND_URLS ||
   process.env.FRONTEND_URL ||
   'http://localhost:5173,http://localhost:3000'
 )
@@ -26,8 +27,7 @@ const allowedOrigins = (
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-// Middleware
-app.use(helmet());
+// Middleware — CORS must come BEFORE helmet so preflight OPTIONS passes
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -35,8 +35,11 @@ app.use(cors({
     }
     return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

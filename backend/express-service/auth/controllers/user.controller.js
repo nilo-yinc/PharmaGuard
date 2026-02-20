@@ -7,7 +7,11 @@ const {
   sendResetPasswordOtpEmail,
 } = require('../utils/sendingMail.utils');
 
-const getFrontendUrl = () => process.env.FRONTEND_URL || 'http://localhost:5173';
+const getFrontendUrl = () =>
+  (process.env.FRONTEND_URL || 'http://localhost:5173')
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)[0] || 'http://localhost:5173';
 
 const safeUserPayload = (user) => ({
   id: user._id,

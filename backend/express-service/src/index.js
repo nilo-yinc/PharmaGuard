@@ -27,10 +27,18 @@ const allowedOrigins = (
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+const isLocalhost = (origin) => /^https?:\/\/localhost(:\d+)?$/.test(origin);
+
 // Middleware — CORS must come BEFORE helmet so preflight OPTIONS passes
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (e.g. curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // In development, allow any localhost port
+    if (process.env.NODE_ENV !== 'production' && isLocalhost(origin)) {
+      return callback(null, true);
+    }
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));

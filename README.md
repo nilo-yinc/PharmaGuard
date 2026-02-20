@@ -26,12 +26,21 @@ Frontend runs on `http://localhost:5173`, backend on `http://localhost:3000`.
 
 1. Frontend (Vercel)
    - Deploy from `frontend/`
-   - Set `VITE_API_BASE_URL=https://<render-backend-domain>`
-2. Backend (Render)
-   - Deploy from `backend/express-service/`
-   - Build: `npm install`
-   - Start: `npm start`
-   - Configure env vars from `backend/express-service/.env.example`
+   - Set `VITE_API_BASE_URL=https://<node-render-domain>`
+
+2. Backend (Render, recommended via Blueprint)
+   - Use root `render.yaml` to create both services:
+     - `pharmaguard-node` (Express API)
+     - `pharmaguard-python` (FastAPI analysis)
+   - In Render Dashboard: `New +` -> `Blueprint` -> select this repo -> apply `render.yaml`
+   - After creation, set secret env vars in Render:
+     - Node: `MONGO_URI`, `JWT_SECRET`, optional email/google keys
+     - Python: optional `GROQ_API_KEY`
+   - Ensure Node env has:
+     - `FRONTEND_URL=https://<your-vercel-frontend-domain>`
+     - `FRONTEND_URLS=https://<your-vercel-frontend-domain>,http://localhost:5173,http://localhost:3000`
+     - `FASTAPI_URL=https://<python-render-domain>`
+     - `BACKEND_BASE_URL=https://<node-render-domain>`
 
 ### Notes
 

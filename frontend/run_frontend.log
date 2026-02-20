@@ -37,3 +37,7 @@ AggregateError [ECONNREFUSED]:
 [2m3:35:47 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/RegisterPage.tsx, /src/index.css[22m
 [2m5:48:58 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/contexts/AuthContext.tsx, /src/index.css, /src/pages/ResetPasswordPage.tsx, /src/pages/LoginPage.tsx[22m
 [2m5:49:16 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LandingPage.tsx, /src/index.css, /src/pages/AnalyzePage.tsx, /src/pages/ProfilePage.tsx, /src/pages/UserDashboard.tsx, /src/pages/ReportPage.tsx, /src/pages/VCFUpload.tsx[22m
+[2m6:11:15 am[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
+[2m6:42:30 am[22m [36m[1m[vite][22m[39m [32m.env.local changed, restarting server...[39m
+[2m6:42:31 am[22m [36m[1m[vite][22m[39m server restarted.
+^C^C

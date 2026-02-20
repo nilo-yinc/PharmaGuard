@@ -359,11 +359,12 @@ const googleLogin = (req, res) => {
   const state = generateState();
   const nonce = generateNonce();
 
+  const isProduction = process.env.NODE_ENV === 'production';
   const cookieOpts = {
     httpOnly: true,
     maxAge: 600000,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction,
   };
   res.cookie('oauth_state', state, cookieOpts);
   res.cookie('oauth_nonce', nonce, cookieOpts);

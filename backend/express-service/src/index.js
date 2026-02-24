@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const axios = require('axios');
 const connectDB = require('./config/database');
 
 // Import routes
@@ -126,6 +127,41 @@ if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Express server running on http://localhost:${PORT}`);
     console.log(`📚 Service: PharmaGuard Express API`);
+
+    // ── Keep-Alive Pinger ─────────────────────────────────────────────
+    // Prevent free-tier services (Render/Vercel) from sleeping after
+    // 15 min of inactivity by self-pinging every 14 minutes.
+    if (process.env.NODE_ENV === 'production') {
+      const PING_INTERVAL = 14 * 60 * 1000; // 14 minutes
+
+      const selfUrl =
+        process.env.BACKEND_BASE_URL ||
+        `http://localhost:${PORT}`;
+      const fastApiUrl = process.env.FASTAPI_URL;
+
+      const keepAlive = async () => {
+        const timestamp = new Date().toISOString();
+        // Ping Express (self)
+        try {
+          await axios.get(`${selfUrl}/health`, { timeout: 10000 });
+          console.log(`💚 [${timestamp}] Keep-alive: Express OK`);
+        } catch (err) {
+          console.warn(`⚠️  [${timestamp}] Keep-alive: Express ping failed —`, err.message);
+        }
+        // Ping FastAPI
+        if (fastApiUrl) {
+          try {
+            await axios.get(`${fastApiUrl}/health`, { timeout: 10000 });
+            console.log(`💚 [${timestamp}] Keep-alive: FastAPI  OK`);
+          } catch (err) {
+            console.warn(`⚠️  [${timestamp}] Keep-alive: FastAPI  ping failed —`, err.message);
+          }
+        }
+      };
+
+      setInterval(keepAlive, PING_INTERVAL);
+      console.log(`⏰ Keep-alive pinger active — pinging every 14 min`);
+    }
   });
 }
 

@@ -2,7 +2,6 @@
   <img src="https://img.shields.io/badge/🧬-PharmaGuard-0d7377?style=for-the-badge&labelColor=0a0a0a&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwZDczNzciIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMiAxNWMwLTQuNCAxLjktNC40IDEuOS05LjUgMC0xLjcgMS4xLTMuNSAzLjEtMy41IDIgMCAzLjEgMS44IDMuMSAzLjVDMTAuMSAxMC42IDEyIDE0IDEyIDE1Ii8+PHBhdGggZD0iTTIyIDE1YzAtNC40LTEuOS00LjQtMS45LTkuNSAwLTEuNy0xLjEtMy41LTMuMS0zLjUtMiAwLTMuMSAxLjgtMy4xIDMuNS0uMSA1LjEtMiA0LjYtMiA5LjUiLz48cGF0aCBkPSJNNiA5aDEyIi8+PHBhdGggZD0iTTcgNmgxMCIvPjxwYXRoIGQ9Ik04IDNoOCIvPjxwYXRoIGQ9Ik05IDEyaDYiLz48cGF0aCBkPSJNMiAxNWgyMCIvPjxwYXRoIGQ9Ik0yIDE4aDIwIi8+PHBhdGggZD0iTTIgMjFoMjAiLz48L3N2Zz4=" alt="PharmaGuard" width="350" />
 </p>
 
-<h1 align="center">PharmaGuard</h1>
 <h3 align="center">AI-Powered Pharmacogenomics Risk Prediction Platform</h3>
 
 <p align="center">
